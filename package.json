@@ -1,6 +1,6 @@
 {
   "name": "react-image-annotate-mngo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "homepage": "./",
@@ -11,7 +11,7 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "git@github.com:adityasuman2025/MNgoReactImageAnnotate.git"
+    "url": "git@github.com:adityasuman2025/MNgoImageAnnotate.git"
   },
   "dependencies": {
     "react-resize-context": "^3.0.0"
