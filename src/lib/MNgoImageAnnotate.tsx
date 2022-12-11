@@ -7,7 +7,6 @@ import deleteImg from "./img/delete.png";
 //@ts-ignore
 import rotateImg from "./img/rotate.png";
 
-
 function myDebounce<Params extends any[]>(functionToRun: (...args: Params) => any, delay: number): (...args: Params) => void {
     let timer: NodeJS.Timeout;
     return (...args: Params) => {
@@ -28,7 +27,7 @@ function MNgoImageAnnotate({
     shapes = {},
     beforeTools = "",
     afterTools = "",
-    annotationData = [],
+    annotations = [],
     onChange,
 }: { [key: string]: any }) {
     const [height, setHeight] = useState<number>(10); //height 10 is loading, 400 is error
@@ -50,8 +49,8 @@ function MNgoImageAnnotate({
             const calcHeight = (width / imgEle.width * imgEle.height) || -400;
             setHeight(calcHeight);
 
-            setAnnot(annotationData || []);
-            renderCanvas(calcHeight, annotationData);
+            setAnnot(annotations || []);
+            renderCanvas(calcHeight, annotations);
         }
         imgEle.onerror = function () {
             setHeight(-400);
