@@ -1,14 +1,15 @@
 import React from 'react';
-//@ts-ignore
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import { MNgoImageAnnotate } from "./lib";
 
 import img from "./img.png";
 import tickImg from "./tick.png";
 import crossImg from "./cross.png";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<AnnotationWrapper />);
+ReactDOM.render(
+    <AnnotationWrapper />,
+    document.getElementById('root')
+);
 
 function AnnotationWrapper({
     annotationData = JSON.parse(localStorage.getItem("annotData") || "{}"),
