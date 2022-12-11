@@ -1,6 +1,6 @@
 {
   "name": "react-image-annotate-mngo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "homepage": "./",
@@ -36,7 +36,7 @@
     "eject": "react-scripts eject",
     "babel-build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored",
     "build-publish": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored && npm publish",
-    "demo-publish": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored && rm -rf demo/node_modules/react-image-annotate-mngo/dist && mv dist demo/node_modules/react-image-annotate-mngo/dist"
+    "demo-start-latest": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored && npm publish && rm -rf demo/node_modules && cd demo && npm install && npm start"
   },
   "eslintConfig": {
     "extends": [

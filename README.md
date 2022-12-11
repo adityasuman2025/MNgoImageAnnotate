@@ -6,7 +6,8 @@ This library is available at [react-image-annotate-mngo](https://www.npmjs.com/p
 
 ## Brief:
 
-A JavaScript Library (npm package ) to memic the design of Sublime Text Editor. One can easily create his web profile in react.js by installing `react-image-annotate-mngo` package
+A JavaScript React Library (npm package ) which provides an area over an image to annotation/markup/write.
+One can easily annotate over image in react.js by installing `react-image-annotate-mngo` package
 
 ## Usage
     <MNgoImageAnnotate
