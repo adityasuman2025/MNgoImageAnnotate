@@ -6,6 +6,7 @@
     -moz-osx-font-smoothing: grayscale;
 
     max-width: 100%;
+    max-height: 100%;
     overflow: auto;
     user-select: none;
     -webkit-user-select: none;
@@ -15,6 +16,7 @@
     position: sticky;
     top: 0;
     left: 0;
+    z-index: 10;
     max-width: 100%;
     min-width: 100%;
     text-align: center;
@@ -26,6 +28,7 @@
     position: sticky;
     top: 0;
     left: 0;
+    z-index: 10;
     max-width: 100%;
     min-width: 100%;
     text-align: center;

@@ -51,6 +51,7 @@ function MNgoImageAnnotate({
 
             setAnnot(annotations || []);
             renderCanvas(calcHeight, annotations);
+            // addTouchSupportToCanvas();
         }
         imgEle.onerror = function () {
             setHeight(-400);
@@ -60,6 +61,64 @@ function MNgoImageAnnotate({
     useEffect(() => {
         if (height > 10 && onChange) onChange({ annotations: annot, width });
     }, [annot]);
+
+
+    /* ---- touch support for canvas stuffs ---- */
+    // useEffect(() => {
+    //     localStorage.setItem("selectedToolBarBtn", selectedToolBarBtn);
+    // }, [selectedToolBarBtn])
+
+    function addTouchSupportToCanvas() {
+        /*
+        selectedToolBarBtn is stored and retrived from localStorage because here
+        we had to use 3rd argument of addEventListener i.e. { passive: false } and e.preventDefault() to prevent scrolling on touch swipe
+        event handlers get atteched to them when this comp loaded and at that time selectedToolBarBtn is empty 
+        so selectedToolBarBtn remains empty for the event handler functions, even after clicking on any tool bar buttons because handler were loaded when the comp was loaded and not updated on updation of selectedToolBarBtn
+        therefore I need to go with localStorage solution to retrive current state of selectedToolBarBtn in event handlers
+
+        issues we got now
+        1. need to store and retrive isDrawingInCanvas and annot too from localStorage because those are also useState which are not binded with our addEventListener event handlers, when they get updated
+        */
+
+        const canvas: any = canvasRef.current;
+        canvas.addEventListener('touchstart', (e: any) => {
+            const activeToolBarBtn = localStorage.getItem("selectedToolBarBtn");
+
+            if (activeToolBarBtn === PENCIL) {
+                e.preventDefault(); // to prevent scolling on touch swipe
+                startDraw(e);
+            }
+        }, { passive: false });
+        canvas.addEventListener('touchmove', (e: any) => {
+            const activeToolBarBtn = localStorage.getItem("selectedToolBarBtn");
+
+            if (activeToolBarBtn === PENCIL) {
+                e.preventDefault(); // to prevent scolling on touch swipe
+                draw(e);
+            }
+        }, { passive: false });
+        canvas.addEventListener('touchend', (e: any) => {
+            const activeToolBarBtn = localStorage.getItem("selectedToolBarBtn");
+
+            if (activeToolBarBtn === PENCIL) {
+                e.preventDefault(); // to prevent scolling on touch swipe
+                stopDraw();
+            }
+        }, { passive: false });
+    }
+
+    function getMousePosOnTouch(event: any) {
+        const { scrollLeft, scrollTop }: { [key: string]: any } = document.getElementById(ANNOTATION_COMP_ID) || {};
+        const { offsetLeft: areaOffsetLeft, offsetTop: areaOffsetTop }: { [key: string]: any } = document.getElementById(AREA_ID) || {};
+
+        const clientX = event.clientX || event.touches[0].clientX;
+        const clientY = event.clientY || event.touches[0].clientY;
+        const offsetX = clientX + scrollLeft - areaOffsetLeft;
+        const offsetY = clientY + scrollTop - areaOffsetTop;
+
+        return { offsetX, offsetY };
+    }
+    /* ---- touch support for canvas stuffs ---- */
 
 
     /* ---- canvas stuffs ---- */
@@ -88,7 +147,7 @@ function MNgoImageAnnotate({
         for (let i = 0; i < annot.length; i++) {
             let { type, src }: { [key: string]: any } = annot[i] || {};
 
-            if (type == PENCIL) {
+            if (type === PENCIL) {
                 let imgEle: any = new Image();
                 imgEle.src = src;
                 imgEle.onload = function () {
@@ -98,8 +157,8 @@ function MNgoImageAnnotate({
         }
     }
 
-    function startDraw({ nativeEvent }: { [key: string]: any }) {
-        const { offsetX, offsetY }: { [key: string]: any } = nativeEvent;
+    function startDraw(e: any) {
+        const { offsetX, offsetY } = (e.type === "touchstart" ? getMousePosOnTouch(e) : e.nativeEvent) || {};
         ctxRef.current.beginPath();
         ctxRef.current.moveTo(offsetX, offsetY);
 
@@ -118,9 +177,9 @@ function MNgoImageAnnotate({
         setAnnot([...annot, { src: imgData, type: PENCIL }]);
     }
 
-    function draw({ nativeEvent }: { [key: string]: any }) {
-        if (!isDrawingInCanvas) return;
-        const { offsetX, offsetY }: { [key: string]: any } = nativeEvent;
+    function draw(e: any) {
+        if (e.type !== "touchmove" && !isDrawingInCanvas) return;
+        const { offsetX, offsetY } = (e.type === "touchmove" ? getMousePosOnTouch(e) : e.nativeEvent) || {};
         ctxRef.current.lineTo(offsetX, offsetY);
         ctxRef.current.stroke();
     }
@@ -154,12 +213,12 @@ function MNgoImageAnnotate({
 
     function handleAnnotDeleteClick(idx: number) {
         setSelectedAnnot("");
-        setAnnot(annot.filter((_, i) => i != idx));
+        setAnnot(annot.filter((_, i) => i !== idx));
     }
 
     function handleAnnotResize(size: { [key: string]: any }, idx: number) {
         setAnnot(annot.map((item, i) => {
-            if (i == idx) item.size = size;
+            if (i === idx) item.size = size;
             return item;
         }));
     }
@@ -175,7 +234,7 @@ function MNgoImageAnnotate({
         if (newX >= 0 && newY >= 0) {
             //to-do add limit condition for img top-right, bottom-left and bottom right too
             setAnnot(annot.map((item, i) => {
-                if (i == idx) item.pos = { x: newX, y: newY }
+                if (i === idx) item.pos = { x: newX, y: newY }
                 return item;
             }));
         }
@@ -201,7 +260,7 @@ function MNgoImageAnnotate({
             const angle: number = Math.atan2(newY - centerY, newX - centerX) * (180 / Math.PI);
 
             setAnnot(annot.map((item, i) => {
-                if (i == idx) item.rotate = angle;
+                if (i === idx) item.rotate = angle;
                 return item;
             }));
         }
@@ -237,7 +296,7 @@ function MNgoImageAnnotate({
                             className={selectedToolBarBtn === type ? "toolBarBtn selectedToolBarBtn" : "toolBarBtn"}
                             onClick={() => handleBtnClick(type)}
                         >
-                            <img src={shapes[type]} />
+                            <img alt={type} src={shapes[type]} />
                         </div>
                     ))
                 }
@@ -283,7 +342,7 @@ function MNgoImageAnnotate({
                         if (type !== PENCIL)
                             return (
                                 <div
-                                    className={idx == selectedAnnot ? "annot selectedAnnot" : "annot"}
+                                    className={idx === selectedAnnot ? "annot selectedAnnot" : "annot"}
                                     key={idx}
                                     style={{ top: pos.y, left: pos.x }}
                                     onClick={(e) => handleAnnotClick(e, idx)}
@@ -306,17 +365,17 @@ function MNgoImageAnnotate({
                                         </ResizeProvider>
 
                                         {
-                                            idx == selectedAnnot ?
+                                            idx === selectedAnnot ?
                                                 <>
                                                     <img
                                                         className="annotRotateBtn"
-                                                        src={rotateImg}
+                                                        src={rotateImg} alt={"rotateImg"}
                                                         onDrag={(e) => myDebounce(handleAnnotRotateStart, 100)(e, idx)}
                                                         onDragEnd={(e) => myDebounce(handleAnnotRotateEnd, 100)(e)}
                                                     />
                                                     <img
                                                         className="annotDeleteBtn"
-                                                        src={deleteImg}
+                                                        src={deleteImg} alt={"deleteImg"}
                                                         onClick={() => handleAnnotDeleteClick(idx)}
                                                     />
                                                 </>
