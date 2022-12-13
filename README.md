@@ -15,6 +15,8 @@ One can easily annotate over image in react.js by installing `react-image-annota
         width={number}
         loader={HTMLElement | string}
         error={HTMLElement | string}
+        beforeTools={HTMLElement | string}
+        afterTools={HTMLElement | string}
         shapes={object}
         annotations={array}
         onChange={function}
@@ -26,7 +28,9 @@ One can easily annotate over image in react.js by installing `react-image-annota
 2. `width`  width of the image, default value is 900
 3. `loader`  HTMLElement or string to display while image is loading/downloading, default value is "loading"
 4. `error`  HTMLElement or string to display when image could not be loaded, default value is "something went wrong"
-5. `shapes`  shape button in tool bar
+5. `beforeTools`  HTMLElement or string to display before shape buttons, e.g. Prev Button
+6. `afterTools`  HTMLElement or string to display after shape buttons (clear button), e.g. Next Button
+7. `shapes`  shape button in tool bar
 
 
             {
@@ -43,7 +47,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
             }
 
 
-6. `annotations` array of annotations present on the image
+8. `annotations` array of annotations present on the image
 
 
             [
@@ -75,7 +79,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
             ]
 
 
-5. `onChange`  callback function run when any change is done on annotations
+9. `onChange`  callback function run when any change is done on annotations
 
         onChange (annotationData: object) => void
 
