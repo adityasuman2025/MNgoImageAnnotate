@@ -35,7 +35,8 @@
     "eject": "react-scripts eject",
     "babel-build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored",
     "build-publish": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored && npm publish",
-    "demo-start-latest": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored && npm publish && rm -rf demo/node_modules && cd demo && npm install && npm start"
+    "build-publish-start-demo": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --extensions '.ts,.tsx,.jsx' --ignore 'src/lib/**/*.test.tsx' --copy-files --no-copy-ignored && npm publish && rm -rf demo/node_modules && cd demo && npm install && npm start",
+    "start-demo": "cd demo && rm -rf node_modules && npm install && npm start"
   },
   "eslintConfig": {
     "extends": [
