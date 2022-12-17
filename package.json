@@ -1,6 +1,7 @@
 {
   "name": "react-image-annotate-mngo",
-  "version": "0.5.1",
+  "version": "0.6.0",
+  "sideEffects": false,
   "main": "dist/index.js",
   "module": "dist/index.js",
   "homepage": "./",
@@ -13,9 +14,7 @@
     "type": "git",
     "url": "git@github.com:adityasuman2025/MNgoImageAnnotate.git"
   },
-  "dependencies": {
-    "react-resize-context": "^3.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.15.4",
     "@babel/preset-env": "^7.15.4",

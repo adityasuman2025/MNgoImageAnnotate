@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef, CSSProperties } from "react";
-import { ResizeProvider, ResizeConsumer } from "react-resize-context"; //ref: https://codesandbox.io/embed/jjjmp4z6yy
+import ResizableDiv from "./ResizableDiv";
 import './MNgoImageAnnotate.css';
 
-//@ts-ignore
 import deleteImg from "./img/delete.png";
-//@ts-ignore
 import rotateImg from "./img/rotate.png";
 
 function myDebounce<Params extends any[]>(functionToRun: (...args: Params) => any, delay: number): (...args: Params) => void {
@@ -348,21 +346,22 @@ function MNgoImageAnnotate({
                                     onClick={(e) => handleAnnotClick(e, idx)}
                                 >
                                     <div className="annotContent">
-                                        <ResizeProvider>
-                                            <ResizeConsumer className="annotImg" onSizeChanged={(size) => handleAnnotResize(size, idx)}>
-                                                <div
-                                                    style={{
-                                                        width: size.width, height: size.height,
-                                                        ...(rotate ? { transform: `rotate(${rotate}deg)` } : {}),
-                                                        backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
-                                                        backgroundImage: `url(${shapes[type]})`,
-                                                    } as CSSProperties}
-                                                    onDrag={(e) => myDebounce(handleAnnotMoveStart, 100)(e, idx)}
-                                                    onDragEnd={(e) => myDebounce(handleAnnotMoveEnd, 100)(e)}
-                                                    draggable={true}
-                                                />
-                                            </ResizeConsumer>
-                                        </ResizeProvider>
+                                        <ResizableDiv
+                                            className="annotImg"
+                                            onResize={(size: any) => handleAnnotResize(size, idx)}
+                                        >
+                                            <div
+                                                style={{
+                                                    width: size.width, height: size.height,
+                                                    ...(rotate ? { transform: `rotate(${rotate}deg)` } : {}),
+                                                    backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
+                                                    backgroundImage: `url(${shapes[type]})`,
+                                                } as CSSProperties}
+                                                onDrag={(e) => myDebounce(handleAnnotMoveStart, 100)(e, idx)}
+                                                onDragEnd={(e) => myDebounce(handleAnnotMoveEnd, 100)(e)}
+                                                draggable={true}
+                                            />
+                                        </ResizableDiv>
 
                                         {
                                             idx === selectedAnnot ?

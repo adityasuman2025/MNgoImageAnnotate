@@ -94,11 +94,6 @@
     position: relative;
 }
 
-.annotImg {
-    resize: both;
-    overflow: hidden;
-}
-
 .annotImg div {
     cursor: grabbing;
 }
