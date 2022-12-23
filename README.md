@@ -11,12 +11,12 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 ## Usage
     <MNgoImageAnnotate
-        image={Image | string}
+        image={string | Image}
         width={number}
-        loader={HTMLElement | string}
-        error={HTMLElement | string}
-        beforeTools={HTMLElement | string}
-        afterTools={HTMLElement | string}
+        loader={string | ReactElement}
+        error={string | ReactElement}
+        beforeTools={string | ReactElement}
+        afterTools={string | ReactElement}
         shapes={object}
         annotations={array}
         onChange={function}
@@ -26,10 +26,10 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 1. `image`  image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
 2. `width`  width of the image, default value is 900
-3. `loader`  HTMLElement or string to display while image is loading/downloading, default value is "loading"
-4. `error`  HTMLElement or string to display when image could not be loaded, default value is "something went wrong"
-5. `beforeTools`  HTMLElement or string to display before shape buttons, e.g. Prev Button
-6. `afterTools`  HTMLElement or string to display after shape buttons (clear button), e.g. Next Button
+3. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
+4. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
+5. `beforeTools`  ReactElement or string to display before shape buttons, e.g. Prev Button
+6. `afterTools`  ReactElement or string to display after shape buttons (clear button), e.g. Next Button
 7. `shapes`  shape button in tool bar
 
 

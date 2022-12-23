@@ -1,35 +1,28 @@
 import React, { useEffect, useRef } from "react";
 
-//ref: https://www.digitalocean.com/community/tutorials/js-resize-observer
-function ResizableDiv({
-    style = {},
-    className = "",
+/* eslint-disable react-hooks/exhaustive-deps */
+export default function ResizableDiv({
+    style: stl = {},
+    className: cn = "",
     children = "",
     onResize,
 }: { [key: string]: any }) {
     const ref = useRef<any>(null);
+    const isMounted = useRef<any>(null);
 
     useEffect(() => {
-        const element = ref.current;
-
-        const myObserver = new ResizeObserver(entries => {
-            try {
-                const entry = entries[0].contentRect || {};
-                onResize({ width: entry.width, height: entry.height });
-            } catch { }
-        });
-
-        myObserver.observe(element);
+        const myObserver = new ResizeObserver(entries => handleResize(entries));
+        myObserver.observe(ref.current);
     }, []);
 
-    return (
-        <div
-            ref={ref} className={className}
-            style={{ resize: "both", overflow: "hidden", ...style }}
-        >
-            {children}
-        </div>
-    )
-}
+    function handleResize(entries: any) {
+        try {
+            const entry = entries[0].contentRect || {};
+            if (isMounted.current && entry.width && entry.height) onResize({ width: entry.width, height: entry.height });
 
-export default ResizableDiv;
+            isMounted.current = true;
+        } catch { }
+    }
+
+    return <div ref={ref} className={cn} style={{ resize: "both", overflow: "hidden", ...stl }}>{children}</div>
+} //ref: https://www.digitalocean.com/community/tutorials/js-resize-observer
