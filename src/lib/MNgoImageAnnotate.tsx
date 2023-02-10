@@ -140,6 +140,7 @@ export default function MNgoImageAnnotate({
                     selectedToolBarBtn === TEXT_TOOL ?
                         <div className="sa-flex sa-items-center sa-justify-center sa-my-1">
                             <textarea
+                                autoFocus
                                 className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
                                 value={textToolContent}
                                 onChange={(e) => setTextToolContent(e.target.value)}

@@ -11,12 +11,12 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 ## Usage
     <MNgoImageAnnotate
+        compIdx={number}
         image={string | Image}
+        loc={number[]}
         width={number}
         loader={string | ReactElement}
         error={string | ReactElement}
-        beforeTools={string | ReactElement}
-        afterTools={string | ReactElement}
         shapes={object}
         annotations={array}
         onChange={function}
@@ -24,17 +24,17 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 `props example`
 
-1. `image`  image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
-2. `width`  width of the image, default value is 900
-3. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
-4. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
-5. `beforeTools`  ReactElement or string to display before shape buttons, e.g. Prev Button
-6. `afterTools`  ReactElement or string to display after shape buttons (clear button), e.g. Next Button
+1. `compIdx`  unique index of the component when using `MNgoImageAnnotate` multiple time in view/screen/oage
+2. `image`  image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
+3. `loc`  loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
+4. `width`  width of the image, default value is 900
+5. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
+6. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
 7. `shapes`  shape button in tool bar
 
 
             {
-                <shape type | title>: <Image | string>,
+                <shape type | title>: { btnIcon: <string | Image>, img: <string | Image> },
             }
 
 
@@ -42,8 +42,8 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 
             {
-                "tick": tickImg,
-                "cross": crossImg,
+                tick: { btnIcon: tickShape, img: tickShape },
+                cross: { btnIcon: crossShape, img: crossShape },
             }
 
 
@@ -74,7 +74,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 },
                 {
                     "type": "pencil",
-                    "src": "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAABTwAAAOoCAYAAAD8tDv4AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAA…",
+                    "pts":[[878,96],[878,98],[878,102],[878,122],[878,168],[874,224],[872,281],[872,331],[872,363]],
                 }
             ]
 
