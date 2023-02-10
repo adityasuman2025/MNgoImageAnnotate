@@ -58,7 +58,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 },
                 {
                     "type": "pencil,
-                    "src": <base64 image string | image url>,
+                    "pts":[ number[] ],
                 }
             ]
 
@@ -74,7 +74,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 },
                 {
                     "type": "pencil",
-                    "pts":[[878,96],[878,98],[878,102],[878,122],[878,168],[874,224],[872,281],[872,331],[872,363]],
+                    "pts":[ [878,96],[878,98],[878,102],[878,122],[878,168],[874,224],[872,281],[872,331],[872,363] ],
                 }
             ]
 
