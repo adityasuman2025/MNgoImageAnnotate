@@ -17,7 +17,7 @@ function Main() {
 
     return (
         <MNgoImageAnnotate
-            image={img2} //"https://tinypng.com/images/social/website.jpg" //
+            image={img} //"https://tinypng.com/images/social/website.jpg"
             width={annotationData.width}
             shapes={{
                 tick: { btnIcon: tickShape, img: tickShape },

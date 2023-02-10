@@ -5,8 +5,11 @@ import { resolve } from 'path';
 //@ts-ignore
 import { devDependencies, dependencies } from './package.json'
 
+const IS_DEPL = process.env.IS_DEPL;
+console.log("IS_DEPL", IS_DEPL)
+
 //ref: https://miyauchi.dev/posts/lib-vite-tailwindcss/
-export default defineConfig({
+const general = defineConfig({
   plugins: [
     plugin({
       'jsxRuntime': 'classic'
@@ -26,3 +29,10 @@ export default defineConfig({
     sourcemap: false
   },
 });
+
+// https://vitejs.dev/config/
+const depoyment = defineConfig({
+  plugins: [plugin()],
+})
+
+export default IS_DEPL ? depoyment : general;

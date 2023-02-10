@@ -20,7 +20,7 @@ function AnnotationWrapper({
             image={"https://tinypng.com/images/social/website.jpg"}
             width={annotationData.width}
             shapes={{
-                cross: { crossImg: crossShape, img: crossImg }
+                cross: { crossImg: crossImg, img: crossImg }
             }}
             annotations={annotationData.annotations}
             onChange={handleChange}
