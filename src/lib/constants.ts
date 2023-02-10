@@ -1,5 +1,8 @@
-const MIN_HEIGHT: number = 100, DEFAULT_WIDTH: number = 900;
-const AREA_ID: string = "area", ANNOTATION_COMP_ID: string = "annotationComp";
-const PENCIL: string = "pencil", UNDO: string = "undo";
+const MIN_HEIGHT: number = 100, DEFAULT_ANNOT_AREA_WIDTH: number = 900;
+const FRAME_ID: string = "frame", AREA_ID: string = "area", ANNOTATION_COMP_ID: string = "annotationComp";
+const UNDO_TOOL = "undo", REDO_TOOL = "redo", PENCIL_TOOL = "pencil", TEXT_TOOL = "text", FULL_SCREEN_TOOL = "fullScreenTool";
 
-export { MIN_HEIGHT, DEFAULT_WIDTH, AREA_ID, ANNOTATION_COMP_ID, PENCIL, UNDO };
+export {
+    MIN_HEIGHT, DEFAULT_ANNOT_AREA_WIDTH, FRAME_ID, AREA_ID, ANNOTATION_COMP_ID,
+    UNDO_TOOL, REDO_TOOL, PENCIL_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL,
+};

@@ -1,7 +1,9 @@
-import React, { CSSProperties } from "react";
-import ResizableDiv from "../ResizableDiv";
-import { deleteIcon, rotateIcon } from "../img";
-import { ANNOTATION_COMP_ID, AREA_ID } from "../constants";
+import React, { CSSProperties, Dispatch, SetStateAction } from "react";
+import { ResizableDiv } from ".";
+import { deleteIcon, rotateIcon } from "../images";
+import { ANNOTATION_COMP_ID, FRAME_ID, AREA_ID, TEXT_TOOL } from "../constants";
+
+const ANNOT_ACTN_BTN_STYLE = "sa-absolute sa-left-[50%] sa-rounded-full sa-w-[23px] sa-h-[23px] sa-p-[3px] sa-translate-x-[-50%] ";
 
 function myDebounce<Params extends any[]>(functionToRun: (...args: Params) => any, delay: number): (...args: Params) => void {
     let timer: any;
@@ -11,16 +13,36 @@ function myDebounce<Params extends any[]>(functionToRun: (...args: Params) => an
     }
 }
 
-interface AnnotationItemTypes {
+function getPosOfAnnot(e: any, compIdx: number, isInFixedContainer: boolean = false) {
+    try {
+        const { scrollX, scrollY } = window || {};
+
+        const { scrollLeft = 0, scrollTop = 0, offsetLeft: compOffsetLeft = 0, offsetTop: compOffsetTop = 0 } = document.getElementById(ANNOTATION_COMP_ID + compIdx) || {};
+        const { offsetLeft: frameOffsetLeft = 0, offsetTop: frameOffsetTop = 0 } = document.getElementById(FRAME_ID + compIdx) || {}; // frame/container offset top & left wrt to its parent
+        const { offsetLeft: areaOffsetLeft = 0, offsetTop: areaOffsetTop = 0 } = document.getElementById(AREA_ID + compIdx) || {};
+
+        const newX: number = (e.pageX + scrollLeft - compOffsetLeft - frameOffsetLeft - areaOffsetLeft) - (isInFixedContainer ? scrollX : 0);
+        const newY: number = (e.pageY + scrollTop - compOffsetTop - frameOffsetTop - areaOffsetTop) - (isInFixedContainer ? scrollY : 0);
+
+        return { x: newX, y: newY };
+    } catch { }
+    return { x: 0, y: 0 };
+}
+
+interface AnnotationItemPropsType {
+    isInFixedContainer?: boolean,
+    compIdx?: number,
     isSelected?: boolean,
     idx: number,
     annotationImg: string,
     item: { [key: string]: any },
-    setAnnot?: (data: any) => void,
+    setAnnot: Dispatch<SetStateAction<{ [key: string]: any }[]>>
     onClick?: (idx: number) => void,
     onDeleteClick?: (idx: number) => void,
 }
 export default function AnnotationItem({
+    isInFixedContainer = false,
+    compIdx = 0,
     isSelected,
     idx,
     annotationImg,
@@ -28,84 +50,57 @@ export default function AnnotationItem({
     setAnnot,
     onClick,
     onDeleteClick,
-}: AnnotationItemTypes) {
+}: AnnotationItemPropsType) {
     function handleAnnotResize(size: { [key: string]: any }, idx: number) {
-        setAnnot && setAnnot((prevAnnot: any[]) =>
-            prevAnnot.map((item, i) => {
-                if (i === idx) item.size = size;
-                return item;
-            }));
+        setAnnot && setAnnot(prevAnnot => prevAnnot.map((item, i) => ({ ...item, size: ((i === idx) ? size : item.size) })));
     }
 
     function handleAnnotMoveStart(e: any, idx: number) {
-        const { scrollLeft, scrollTop }: { [key: string]: any } = document.getElementById(ANNOTATION_COMP_ID) || {};
-        const { offsetLeft: areaOffsetLeft, offsetTop: areaOffsetTop }: { [key: string]: any } = document.getElementById(AREA_ID) || {};
+        const { x, y } = getPosOfAnnot(e, compIdx, isInFixedContainer) || {};
 
-        const { width = 0, height = 0 }: { [key: string]: any } = item.size || {};
+        const newX = x - ((item?.size?.width || 0) / 2), newY = y - ((item?.size?.height || 0) / 2);
+        if (newX >= 0 && newY >= 0) setAnnot(prev => prev.map((item, i) => ({ ...item, pos: ((i === idx) ? { x: newX, y: newY } : item.pos) })));
 
-        const newX: number = e.pageX + scrollLeft - areaOffsetLeft - width / 2;
-        const newY: number = e.pageY + scrollTop - areaOffsetTop - height / 2;
-        if (newX >= 0 && newY >= 0) {
-            setAnnot && setAnnot((prevAnnot: any[]) =>
-                prevAnnot.map((item, i) => {
-                    if (i === idx) item.pos = { x: newX, y: newY };
-                    return item;
-                }));
-        }
-
-        setTimeout(() => e.target.classList.add("invisibleAnnot"), 0);
-    }
-
-    function handleAnnotMoveEnd(e: any) {
-        setTimeout(() => e.target.classList.remove("invisibleAnnot"), 0);
+        setTimeout(() => e.target.classList.add("sa-opacity-0"), 0);
     }
 
     function handleAnnotRotateStart(e: any, idx: number) {
-        const { scrollLeft, scrollTop }: { [key: string]: any } = document.getElementById(ANNOTATION_COMP_ID) || {};
-        const { offsetLeft: areaOffsetLeft, offsetTop: areaOffsetTop }: { [key: string]: any } = document.getElementById(AREA_ID) || {};
-
-        const { x = 0, y = 0 }: { [key: string]: any } = item.pos || {};
-        const { width = 0, height = 0 }: { [key: string]: any } = item.size || {};
-
-        const centerX: number = x + width / 2, centerY: number = y + height / 2;
-        const newX: number = e.pageX + scrollLeft - areaOffsetLeft, newY: number = e.pageY + scrollTop - areaOffsetTop;
-
-        if (e.pageX && e.pageY) {
+        const { x: newX, y: newY } = getPosOfAnnot(e, compIdx, isInFixedContainer) || {};
+        if (newX >= 0 && newY >= 0) {
+            const centerX = (item?.pos?.x || 0) + ((item?.size?.width || 0) / 2), centerY = (item?.pos?.y || 0) + ((item?.size?.height || 0) / 2);
             const rotate: number = Math.atan2(newY - centerY, newX - centerX) * (180 / Math.PI);
-            setAnnot && setAnnot((prevAnnot: any[]) =>
-                prevAnnot.map((item, i) => {
-                    if (i === idx) item.rotate = rotate;
-                    return item;
-                }));
+
+            setAnnot(prev => prev?.map((item, i) => ({ ...item, rotate: ((i === idx) ? rotate : item?.rotate) })));
         }
 
-        setTimeout(() => e.target.classList.add("invisibleAnnot"), 0);
+        setTimeout(() => e.target.classList.add("sa-opacity-0"), 0);
     }
 
-    function handleAnnotRotateEnd(e: any) {
-        setTimeout(() => e.target.classList.remove("invisibleAnnot"), 0);
+    function removeAnnotOpactiy(e: any) {
+        setTimeout(() => e.target.classList.remove("sa-opacity-0"), 0);
     }
 
-    const { pos = {}, size = {}, rotate = 0 } = item;
-
+    const { pos = {}, size = {}, rotate = 0, type, html = "" } = item;
     return (
         <div
-            className={isSelected ? "annot selectedAnnot" : "annot"}
+            className={`!sa-absolute ${isSelected ? "sa-border-[2px] sa-border-solid sa-border-[lime]" : ""}`}
             style={{ top: pos.y, left: pos.x }}
             onClick={(e) => { e.stopPropagation(); onClick && onClick(idx) }}
         >
-            <div className="annotContent">
+            <div className="sa-relative">
                 <ResizableDiv className="annotImg" onResize={(size: any) => handleAnnotResize(size, idx)}>
                     <div
+                        className="sa-cursor-grabbing sa-text-[red] sa-text-[18pt]"
                         style={{
-                            width: size.width, height: size.height,
+                            width: size?.width, height: size?.height,
                             ...(rotate ? { transform: `rotate(${rotate}deg)` } : {}),
                             backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
-                            backgroundImage: `url(${annotationImg})`,
+                            ...(type === TEXT_TOOL ? {} : { backgroundImage: `url(${annotationImg})` }),
                         } as CSSProperties}
                         onDrag={(e) => myDebounce(handleAnnotMoveStart, 100)(e, idx)}
-                        onDragEnd={(e) => myDebounce(handleAnnotMoveEnd, 100)(e)}
+                        onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 100)(e)}
                         draggable={true}
+                        {...(type === TEXT_TOOL ? { dangerouslySetInnerHTML: { __html: html || "" } } : {})} //if type is text tool then rendering the html 
                     />
                 </ResizableDiv>
 
@@ -113,13 +108,13 @@ export default function AnnotationItem({
                     isSelected ?
                         <>
                             <img
-                                className="annotRotateBtn"
+                                className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[yellowgreen] sa-top-[-40px] sa-cursor-grab`}
                                 src={rotateIcon} alt={"rotateIcon"}
                                 onDrag={(e) => myDebounce(handleAnnotRotateStart, 100)(e, idx)}
-                                onDragEnd={(e) => myDebounce(handleAnnotRotateEnd, 100)(e)}
+                                onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 100)(e)}
                             />
                             <img
-                                className="annotDeleteBtn"
+                                className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[red] sa-bottom-[-40px] sa-cursor-pointer sa-drag-none`}
                                 src={deleteIcon} alt={"deleteIcon"}
                                 onClick={() => { onDeleteClick && onDeleteClick(idx) }}
                             />

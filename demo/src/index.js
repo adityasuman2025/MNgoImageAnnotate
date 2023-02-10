@@ -18,11 +18,9 @@ function AnnotationWrapper({
     return (
         <MNgoImageAnnotate
             image={"https://tinypng.com/images/social/website.jpg"}
-            width={annotationData.width || window.innerWidth - 100}
-            loader={"loading"}
-            error={"something went wrong"}
+            width={annotationData.width}
             shapes={{
-                cross: crossImg
+                cross: { crossImg: crossShape, img: crossImg }
             }}
             annotations={annotationData.annotations}
             onChange={handleChange}

@@ -1,24 +1,26 @@
 import React, { useEffect, useRef } from "react";
 
-/* eslint-disable react-hooks/exhaustive-deps */
+interface ResizableDivPropsType {
+    [key: string]: any
+}
 export default function ResizableDiv({
     style: stl = {},
     className: cn = "",
     children = "",
     onResize,
-}: { [key: string]: any }) {
+}: ResizableDivPropsType) {
     const ref = useRef<any>(null);
     const isMounted = useRef<any>(null);
 
     useEffect(() => {
         const myObserver = new ResizeObserver(entries => handleResize(entries));
-        myObserver.observe(ref.current);
+        myObserver?.observe(ref?.current);
     }, []);
 
     function handleResize(entries: any) {
         try {
-            const entry = entries[0].contentRect || {};
-            if (isMounted.current && entry.width && entry.height) onResize({ width: entry.width, height: entry.height });
+            const entry = entries?.[0]?.contentRect || {};
+            if (isMounted?.current && entry?.width && entry?.height) onResize({ width: entry.width, height: entry.height });
 
             isMounted.current = true;
         } catch { }

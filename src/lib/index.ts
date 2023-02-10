@@ -1,4 +1,3 @@
-import MNgoImageAnnotate from './MNgoImageAnnotate';
-import ResizableDiv from './ResizableDiv';
+import MNgoImageAnnotate from "./MNgoImageAnnotate";
 
-export { MNgoImageAnnotate, ResizableDiv };
+export { MNgoImageAnnotate };

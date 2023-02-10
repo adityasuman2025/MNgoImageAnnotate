@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .sa-loadingAnimation{
+    box-sizing:border-box;
+    width:40px;
+    height:40px;
+    border:4px solid lightgrey;
+    border-radius:50%;
+    animation:lds-ring 1.2s cubic-bezier(.5,0,.5,1) infinite;
+    border-color: #8C69FF lightgrey #8C69FF
+  }
+
+  .lds-ring{
+    animation-delay:-.45s
+  }
+
+  @keyframes lds-ring{
+    0% {transform:rotate(0deg)}
+    100% {transform:rotate(360deg)}
+  }
+}

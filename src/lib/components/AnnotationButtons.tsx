@@ -1,49 +1,69 @@
-import React, { ReactElement } from "react";
-import { PENCIL } from "../constants";
+import React from "react";
+import { UNDO_TOOL, REDO_TOOL, PENCIL_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL } from "../constants";
+import { undoToolIcon, redoToolIcon, pencilToolIcon, textToolIcon, fullScrToolIcon } from "../images";
 
-interface AnnotationButtonsTypes {
-    height: number,
-    beforeTools?: string | ReactElement,
-    afterTools?: string | ReactElement,
-    shapes?: { [key: string]: string },
-    selectedToolBarBtn: string,
-    setSelectedToolBarBtn: (type: string) => void,
-    onUndoClick: (undoAll: boolean) => void
+const TOOL_STYLE = "sa-ml-[16px] sa-p-[3px] sa-flex sa-items-center sa-justify-center sa-cursor-pointer sa-rounded-full";
+const SELECTED_TOOL_STYLE = "sa-shadow sa-bg-neutral-200 sa-border-[0.5px] sa-border-solid sa-border-stone-300";
+const DISABLED_TOOL_STYLE = "sa-pointer-events-none sa-opacity-20";
+const TOOL_WIDTH = 12;
+
+const DEFAULT_TOOLS: { [key: string]: any } = {
+    [PENCIL_TOOL]: { btnIcon: pencilToolIcon },
+    [TEXT_TOOL]: { btnIcon: textToolIcon }
 }
 
+interface AnnotationButtonsPropsType {
+    isLoading?: boolean,
+    shapes?: { [key: string]: any },
+    isRedoEnabled: boolean,
+    isUndoEnabled: boolean,
+    selectedTool: string,
+    onToolClick: (type: string) => void,
+}
 export default function AnnotationButtons({
-    height,
-    beforeTools = "",
-    afterTools = "",
+    isLoading = true,
     shapes = {},
-    selectedToolBarBtn,
-    setSelectedToolBarBtn,
-    onUndoClick,
-}: AnnotationButtonsTypes) {
+    isRedoEnabled,
+    isUndoEnabled,
+    selectedTool,
+    onToolClick,
+}: AnnotationButtonsPropsType) {
     return (
-        <div id="toolBar" className={height <= 10 ? "disabledToolBar" : ""}>
-            {beforeTools}
+        <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] ${isLoading ? "pointer-events-none sa-opacity-20" : ""}`}>
+            <div className={`sa-flex sa-items-center sa-justify-center`}>
+                <div className={`sa-cursor-pointer ${isUndoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(UNDO_TOOL)}>
+                    <img src={undoToolIcon} width={16} height={TOOL_WIDTH + 2} />
+                </div>
+                <div className={`sa-ml-[16px] sa-cursor-pointer ${isRedoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(REDO_TOOL)}>
+                    <img src={redoToolIcon} width={16} height={TOOL_WIDTH + 2} />
+                </div>
+            </div>
 
-            {
-                Object.keys(shapes).map((type, idx) => (
-                    <div
-                        key={type + "_" + idx}
-                        className={selectedToolBarBtn === type ? "toolBarBtn selectedToolBarBtn" : "toolBarBtn"}
-                        onClick={() => { setSelectedToolBarBtn(type) }}
-                    >
-                        <img alt={type} src={shapes[type]} />
-                    </div>
-                ))
-            }
+            <div className={`sa-flex sa-items-center sa-justify-center`}>
+                {
+                    Object.keys(DEFAULT_TOOLS).map((type, idx) => (
+                        <div className={`${TOOL_STYLE} ${selectedTool === type ? SELECTED_TOOL_STYLE : ""}`}
+                            key={type + "_" + idx} title={type} onClick={() => onToolClick(type)}
+                        >
+                            <img src={DEFAULT_TOOLS?.[type]?.btnIcon} height={TOOL_WIDTH} width={TOOL_WIDTH} />
+                        </div>
+                    ))
+                }
 
-            <div
-                className={selectedToolBarBtn === PENCIL ? "toolBarBtn selectedToolBarBtn" : "toolBarBtn"}
-                onClick={() => { setSelectedToolBarBtn(PENCIL) }}
-            >{PENCIL}</div>
-            <div className="toolBarBtn" onClick={() => onUndoClick(false)}>undo</div>
-            <div className="toolBarBtn" onClick={() => onUndoClick(true)}>clear</div>
+                {
+                    Object.keys(shapes).map((type, idx) => (
+                        <div className={`${TOOL_STYLE} ${selectedTool === type ? SELECTED_TOOL_STYLE : ""}`}
+                            key={type + "_" + idx} title={type} onClick={() => onToolClick(type)}
+                        >
+                            <img src={shapes?.[type]?.btnIcon} height={TOOL_WIDTH} width={TOOL_WIDTH} />
+                        </div>
+                    ))
+                }
 
-            {afterTools}
+                <div className="sa-ml-[28px] sa-cursor-pointer" onClick={() => onToolClick(FULL_SCREEN_TOOL)}>
+                    <img src={fullScrToolIcon} width={TOOL_WIDTH} height={TOOL_WIDTH} />
+                </div>
+            </div>
         </div>
     )
 }
