@@ -1,13 +1,12 @@
-import React, { useEffect, useState, CSSProperties, ReactElement, useRef } from "react";
-import "./index.css";
-
+import React, { useEffect, useState, CSSProperties, ReactElement, useRef, Dispatch, SetStateAction } from "react";
 import { AnnotationButtons, AnnotationItem, Canvas, Modal, Loader } from "./components";
 import {
     MIN_HEIGHT, DEFAULT_ANNOT_AREA_WIDTH, FRAME_ID, AREA_ID, ANNOTATION_COMP_ID,
     PENCIL_TOOL, UNDO_TOOL, REDO_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL
 } from "./constants";
+import "./index.css";
 
-const CORR_FULL_SCR_MODAL = "corrFullScreenModal";
+const CORR_FULL_SCR_MODAL = "corrFullScreenModal", TOOL_BAR_HEIGHT = 55, SCROLL_BAR_HEIGHT = 20;
 
 interface MNgoImageAnnotatePropsType {
     compIdx?: number,
@@ -16,6 +15,7 @@ interface MNgoImageAnnotatePropsType {
     width?: number,
     loader?: string | ReactElement,
     error?: string | ReactElement,
+    textInputField?: (textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement,
     shapes?: { [key: string]: any },
     annotations?: any[],
     onChange?: (data: { [key: string]: any }) => void
@@ -27,6 +27,16 @@ export default function MNgoImageAnnotate({
     width = DEFAULT_ANNOT_AREA_WIDTH,
     loader = <Loader />,
     error = "Something went wrong",
+    textInputField = (textInputVal, setTextInputVal) => {
+        return (
+            <textarea
+                autoFocus
+                className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
+                value={textInputVal}
+                onChange={(e) => setTextInputVal(e.target.value)}
+            />
+        )
+    },
     shapes = {},
     annotations = [],
     onChange,
@@ -91,11 +101,22 @@ export default function MNgoImageAnnotate({
 
         if (selectedToolBarBtn) {
             const size = shapes?.[selectedToolBarBtn]?.size || { height: 50, width: 50 };
-            setAnnot([...annot, {
-                type: selectedToolBarBtn, size,
-                pos: { x: mousePos.x - size.width / 2, y: mousePos.y - size.height / 2 },
-                ...(selectedToolBarBtn === TEXT_TOOL ? { html: textToolContent } : {})
-            }]);
+
+            if (selectedToolBarBtn === TEXT_TOOL) {
+                if ((textToolContent?.trim() !== "") && (textToolContent?.trim() !== undefined)) {
+                    setAnnot([...annot, {
+                        type: selectedToolBarBtn, size,
+                        pos: { x: mousePos.x - size.width / 2, y: mousePos.y - size.height / 2 },
+                        html: textToolContent
+                    }]);
+                }
+            } else {
+                setAnnot([...annot, {
+                    type: selectedToolBarBtn, size,
+                    pos: { x: mousePos.x - size.width / 2, y: mousePos.y - size.height / 2 },
+                }]);
+            }
+
             setTextToolContent(""); //emptying the text tool content in the editor
         }
     }
@@ -116,8 +137,11 @@ export default function MNgoImageAnnotate({
         return (
             <div
                 id={ANNOTATION_COMP_ID + compIdx}
-                className={`sa-bg-white sa-overflow-auto sa-select-none sa-relative sa-max-h-screen`}
-                style={{ minWidth: width + 20, maxWidth: width + 20, height: frameDims.height }} // 20 is added to adjust scrollbar width
+                className={`sa-bg-white sa-overflow-auto sa-select-none sa-relative sa-max-h-[calc(100vh-100px)]`}
+                style={{
+                    minWidth: width + SCROLL_BAR_HEIGHT, maxWidth: width + SCROLL_BAR_HEIGHT,
+                    height: frameDims.height + TOOL_BAR_HEIGHT, minHeight: MIN_HEIGHT + TOOL_BAR_HEIGHT
+                }} // SCROLL_BAR_HEIGHT is added to adjust scrollbar width // TOOL_BAR_HEIGHT is added to adjust the tool bar height
             >
                 <AnnotationButtons
                     isLoading={height <= 10}
@@ -139,19 +163,14 @@ export default function MNgoImageAnnotate({
                 {
                     selectedToolBarBtn === TEXT_TOOL ?
                         <div className="sa-flex sa-items-center sa-justify-center sa-my-1">
-                            <textarea
-                                autoFocus
-                                className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
-                                value={textToolContent}
-                                onChange={(e) => setTextToolContent(e.target.value)}
-                            />
+                            {textInputField && textInputField(textToolContent, setTextToolContent)}
                         </div>
                         : null
                 }
 
                 {
                     height <= 10 ?
-                        <div className="sa-sticky sa-top-0 sa-z-10 sa-py-[7px]">
+                        <div className={`sa-absolute sa-top-[${TOOL_BAR_HEIGHT}] sa-left-0 sa-right-0`}>
                             {height === -400 ? error : loader}
                         </div>
                         : null
@@ -210,7 +229,6 @@ export default function MNgoImageAnnotate({
     return (
         <div className="sa">
             <Modal
-                className={`!sa-max-h-screen`}
                 open={modalData.isOpen}
                 hideTitle={modalData.hideTitle}
                 onClose={() => { setModalData(prev => ({ ...prev, isOpen: false })) }}

@@ -29,7 +29,7 @@ export default function Modal({
                         ref={bckRef}
                         onClick={(e) => { if (e.target === bckRef.current) onClose(); }}
                     >
-                        <div className={`sa-bg-white sa-rounded-xl sa-max-w-[1088px] sa-max-h-[calc(100vh-200px)] sa-min-w-[250px] sa-min-h-[150px] sa-overflow-y-auto ${className}`}>
+                        <div className={`sa-bg-white sa-rounded-xl sa-max-w-[1088px] sa-max-h-[calc(100vh-100px)] sa-min-w-[250px] sa-min-h-[150px] sa-overflow-y-auto ${className}`}>
                             {
                                 hideTitle ? null :
                                     <div className={`sa-sticky sa-top-0  sa-bg-white sa-flex sa-items-center sa-justify-between sa-p-5 sa-shadow ${headerClassName}`}>

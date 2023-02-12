@@ -1,13 +1,24 @@
 # react-image-annotate-mngo
 This library is available at [react-image-annotate-mngo](https://www.npmjs.com/package/react-image-annotate-mngo)
 
+
 ## Demo
 [annotate.mngo.in](https://annotate.mngo.in)
+
 
 ## Brief:
 
 A JavaScript React Library (npm package ) which provides an area over an image to annotation/markup/write.
 One can easily annotate over image in react.js by installing `react-image-annotate-mngo` package
+
+
+## Screenshots:
+<img src="screenshots/1.png" alt="screenshot 1">
+
+<img src="screenshots/2.png" alt="screenshot 2">
+
+<img src="screenshots/3.png" alt="screenshot 3">
+
 
 ## Usage
     <MNgoImageAnnotate
@@ -17,9 +28,10 @@ One can easily annotate over image in react.js by installing `react-image-annota
         width={number}
         loader={string | ReactElement}
         error={string | ReactElement}
-        shapes={object}
-        annotations={array}
-        onChange={function}
+        textInputField={(textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement}
+        shapes={{ [key: string]: any }}
+        annotations={any[]}
+        onChange={(data: { [key: string]: any }) => void}
     />
 
 `props example`
@@ -30,7 +42,23 @@ One can easily annotate over image in react.js by installing `react-image-annota
 4. `width`  width of the image, default value is 900
 5. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
 6. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
-7. `shapes`  shape button in tool bar
+7. `textInputField`  a function to render Text Tool Input Field
+        e.g.
+
+
+            function (textInputVal, setTextInputVal) => {
+                return (
+                    <textarea
+                        autoFocus
+                        className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
+                        value={textInputVal}
+                        onChange={(e) => setTextInputVal(e.target.value)}
+                    />
+                )
+            }
+
+
+8. `shapes`  shape button in tool bar
 
 
             {
@@ -47,18 +75,24 @@ One can easily annotate over image in react.js by installing `react-image-annota
             }
 
 
-8. `annotations` array of annotations present on the image
+9. `annotations` array of annotations present on the image
 
 
             [
                 {
                     "type": <shape type or title>,
                     "pos": { "x": number, "y": number },
-                    "size": { "height": number, "width": number }
+                    "size": { "height": number, "width": number },
                 },
                 {
                     "type": "pencil,
-                    "pts":[ number[] ],
+                    "pts": [number, number][],
+                },
+                {
+                    "type": "pencil,
+                    "pos": { "x": number, "y": number },
+                    "size": { "height": number, "width": number },
+                    "html": string,
                 }
             ]
 
@@ -69,17 +103,23 @@ One can easily annotate over image in react.js by installing `react-image-annota
             [
                 {
                     "type": "cross",
-                    "pos": { "x": 757,"y": 224 },
-                    "size": {"height": 50, "width": 50}
+                    "pos": { "x": 757, "y": 224 },
+                    "size": { "height": 50, "width": 50 },
                 },
                 {
                     "type": "pencil",
                     "pts":[ [878,96],[878,98],[878,102],[878,122],[878,168],[874,224],[872,281],[872,331],[872,363] ],
+                },
+                {
+                    "type": "pencil",
+                    "pos": { "x": 408, "y": 115 },
+                    "size": { "height": 62 , "width": 126},
+                    "html": "hello world",
                 }
             ]
 
 
-9. `onChange`  callback function run when any change is done on annotations
+10. `onChange`  callback function run when any change is done on annotations
 
         onChange (annotationData: object) => void
 
@@ -91,6 +131,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 1. npm install
 2. npm start
+
 
 ## Available Scripts
 

@@ -19,6 +19,17 @@ function Main() {
         <MNgoImageAnnotate
             image={img} //"https://tinypng.com/images/social/website.jpg"
             width={annotationData.width}
+            // loc={[0, 857, 1620, 1825]}
+            textInputField={(textInputVal, setTextInputVal) => {
+                return (
+                    <textarea
+                        autoFocus
+                        className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
+                        value={textInputVal}
+                        onChange={(e) => setTextInputVal(e.target.value)}
+                    />
+                )
+            }}
             shapes={{
                 tick: { btnIcon: tickShape, img: tickShape },
                 cross: { btnIcon: crossShape, img: crossShape },

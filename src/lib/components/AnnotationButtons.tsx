@@ -29,7 +29,7 @@ export default function AnnotationButtons({
     onToolClick,
 }: AnnotationButtonsPropsType) {
     return (
-        <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] ${isLoading ? "pointer-events-none sa-opacity-20" : ""}`}>
+        <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] ${isLoading ? "sa-pointer-events-none sa-opacity-20" : ""}`}>
             <div className={`sa-flex sa-items-center sa-justify-center`}>
                 <div className={`sa-cursor-pointer ${isUndoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(UNDO_TOOL)}>
                     <img src={undoToolIcon} width={16} height={TOOL_WIDTH + 2} alt="tool" />
