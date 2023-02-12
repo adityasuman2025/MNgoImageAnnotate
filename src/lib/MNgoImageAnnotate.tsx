@@ -1,8 +1,9 @@
 import React, { useEffect, useState, CSSProperties, ReactElement, useRef, Dispatch, SetStateAction } from "react";
+import html2canvas from 'html2canvas';
 import { AnnotationButtons, AnnotationItem, Canvas, Modal, Loader } from "./components";
 import {
     MIN_HEIGHT, DEFAULT_ANNOT_AREA_WIDTH, FRAME_ID, AREA_ID, ANNOTATION_COMP_ID,
-    PENCIL_TOOL, UNDO_TOOL, REDO_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL
+    PENCIL_TOOL, CAPTURE_TOOL, UNDO_TOOL, REDO_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL
 } from "./constants";
 import "./index.css";
 
@@ -135,6 +136,19 @@ export default function MNgoImageAnnotate({
         }
     }
 
+    function captureSS() {
+        html2canvas(document.getElementById(FRAME_ID + compIdx) || document.body)
+            .then(function (canvas) {
+                const dataURL = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+
+                var link = document.createElement("a");
+                link.setAttribute('download', `MNgoImageAnnotate-${new Date().getTime()}.png`);
+                link.setAttribute('href', dataURL);
+                link.click();
+            })
+            .catch(e => { console.log("failed to capture screenshot", e) });
+    }
+
     function render(compIdx: number) {
         return (
             <div
@@ -155,6 +169,8 @@ export default function MNgoImageAnnotate({
                     onToolClick={(tool) => {
                         if ([UNDO_TOOL, REDO_TOOL].includes(tool)) {
                             handleUndoClick(tool === REDO_TOOL ? true : false);
+                        } else if (tool === CAPTURE_TOOL) {
+                            captureSS();
                         } else if (tool === FULL_SCREEN_TOOL) {
                             setModalData({ isOpen: true, type: CORR_FULL_SCR_MODAL, hideTitle: true });
                         } else {

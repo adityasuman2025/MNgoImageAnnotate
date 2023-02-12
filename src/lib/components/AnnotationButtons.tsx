@@ -1,6 +1,6 @@
 import React from "react";
-import { UNDO_TOOL, REDO_TOOL, PENCIL_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL } from "../constants";
-import { undoToolIcon, redoToolIcon, pencilToolIcon, textToolIcon, fullScrToolIcon } from "../images";
+import { CAPTURE_TOOL, UNDO_TOOL, REDO_TOOL, PENCIL_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL } from "../constants";
+import { ssToolIcon, undoToolIcon, redoToolIcon, pencilToolIcon, textToolIcon, fullScrToolIcon } from "../images";
 
 const TOOL_STYLE = "sa-ml-[16px] sa-p-[3px] sa-flex sa-items-center sa-justify-center sa-cursor-pointer sa-rounded-full";
 const SELECTED_TOOL_STYLE = "sa-shadow sa-bg-neutral-200 sa-border-[0.5px] sa-border-solid sa-border-stone-300";
@@ -31,11 +31,15 @@ export default function AnnotationButtons({
     return (
         <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] ${isLoading ? "sa-pointer-events-none sa-opacity-20" : ""}`}>
             <div className={`sa-flex sa-items-center sa-justify-center`}>
-                <div className={`sa-cursor-pointer ${isUndoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(UNDO_TOOL)}>
-                    <img src={undoToolIcon} width={16} height={TOOL_WIDTH + 2} alt="tool" />
+                <div className={`sa-cursor-pointer sa-w-[20px] sa-h-[20px] sa-flex sa-items-start sa-justify-center`} onClick={() => onToolClick(CAPTURE_TOOL)}>
+                    <img src={ssToolIcon} width={TOOL_WIDTH + 10} height={TOOL_WIDTH + 10} alt="tool" />
                 </div>
-                <div className={`sa-ml-[16px] sa-cursor-pointer ${isRedoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(REDO_TOOL)}>
-                    <img src={redoToolIcon} width={16} height={TOOL_WIDTH + 2} alt="tool" />
+
+                <div className={`sa-mx-[16px] sa-cursor-pointer ${isUndoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(UNDO_TOOL)}>
+                    <img src={undoToolIcon} width={TOOL_WIDTH + 2} height={TOOL_WIDTH + 2} alt="tool" />
+                </div>
+                <div className={`sa-cursor-pointer ${isRedoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(REDO_TOOL)}>
+                    <img src={redoToolIcon} width={TOOL_WIDTH + 2} height={TOOL_WIDTH + 2} alt="tool" />
                 </div>
             </div>
 

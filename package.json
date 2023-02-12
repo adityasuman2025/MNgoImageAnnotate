@@ -30,7 +30,9 @@
     "build-publish": "npm run babel-build && npm publish",
     "demo": "cd demo && rm -rf node_modules && npm install && npm start"
   },
-  "dependencies": {},
+  "dependencies": {
+    "html2canvas": "^1.4.1"
+  },
   "devDependencies": {
     "@types/node": "17.0.23",
     "@types/react": "^18.0.26",

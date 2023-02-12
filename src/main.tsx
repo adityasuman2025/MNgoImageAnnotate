@@ -5,40 +5,66 @@ import { MNgoImageAnnotate } from "./lib";
 import tickShape from "./tickShape.svg";
 import crossShape from "./crossShape.svg";
 import qstnShape from "./qstnShape.svg";
-
 import img from "./img.png";
-const img2 = "https://s3.ap-south-1.amazonaws.com/blc-assessed-prd-ap-south-1/results/615aafe617b0c97a6adcecbb/21-22/CBSE/Homework/Homework-CBSE-IX-Mathematics-B10-05-07-2022-360090/IX/Mathematics/B10/input/img_aligned/cef8fabfe264aa58b7c95a36e2f56acf_68604_0049.jpg"
+
+function blobToBase64(blob: any): any {
+    return new Promise((resolve, _) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+    });
+}
 
 const annotationData = JSON.parse(localStorage.getItem("annotData") || "{}");
+const annotImg = localStorage.getItem("annotImg");
+
 function Main() {
     function handleChange(annotData: { [key: string]: any }) {
         localStorage.setItem("annotData", JSON.stringify(annotData)); //storing annotations in localStorage
     }
 
     return (
-        <MNgoImageAnnotate
-            // compMaxHeight={"calc(100vh)"}
-            image={img} //"https://tinypng.com/images/social/website.jpg"
-            // loc={[0, 857, 1620, 1825]}
-            imgWidth={annotationData.imgWidth}
-            textInputField={(textInputVal, setTextInputVal) => {
-                return (
-                    <textarea
-                        autoFocus
-                        className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
-                        value={textInputVal}
-                        onChange={(e) => setTextInputVal(e.target.value)}
-                    />
-                )
-            }}
-            shapes={{
-                tick: { btnIcon: tickShape, img: tickShape },
-                cross: { btnIcon: crossShape, img: crossShape },
-                question: { btnIcon: qstnShape, img: qstnShape },
-            }}
-            annotations={annotationData.annotations}
-            onChange={handleChange}
-        />
+        <>
+            <div style={{ background: "#f1f1f1", height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span>Upload Image </span>
+                <input type="file"
+                    onChange={async (e) => {
+                        const file = e?.target?.files?.[0];
+                        if (file) {
+                            const base64Img = await blobToBase64(file);
+
+                            localStorage.setItem("annotImg", base64Img); // storing image in localStorage
+                            location.reload();
+                        }
+                    }}
+                />
+            </div>
+            <br />
+
+            <MNgoImageAnnotate
+                // compMaxHeight={"calc(100vh)"}
+                image={annotImg || img} //"https://tinypng.com/images/social/website.jpg"
+                // loc={[0, 857, 1620, 1825]}
+                imgWidth={annotationData.imgWidth}
+                textInputField={(textInputVal, setTextInputVal) => {
+                    return (
+                        <textarea
+                            autoFocus
+                            className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
+                            value={textInputVal}
+                            onChange={(e) => setTextInputVal(e.target.value)}
+                        />
+                    )
+                }}
+                shapes={{
+                    tick: { btnIcon: tickShape, img: tickShape },
+                    cross: { btnIcon: crossShape, img: crossShape },
+                    question: { btnIcon: qstnShape, img: qstnShape },
+                }}
+                annotations={annotationData.annotations}
+                onChange={handleChange}
+            />
+        </>
     )
 }
 
