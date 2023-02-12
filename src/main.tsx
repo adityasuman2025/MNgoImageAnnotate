@@ -17,9 +17,10 @@ function Main() {
 
     return (
         <MNgoImageAnnotate
+            // compMaxHeight={"calc(100vh)"}
             image={img} //"https://tinypng.com/images/social/website.jpg"
-            width={annotationData.width}
             // loc={[0, 857, 1620, 1825]}
+            imgWidth={annotationData.imgWidth}
             textInputField={(textInputVal, setTextInputVal) => {
                 return (
                     <textarea

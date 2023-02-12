@@ -22,10 +22,11 @@ One can easily annotate over image in react.js by installing `react-image-annota
 
 ## Usage
     <MNgoImageAnnotate
+        compMaxHeight={string}
         compIdx={number}
         image={string | Image}
         loc={number[]}
-        width={number}
+        imgWidth={number}
         loader={string | ReactElement}
         error={string | ReactElement}
         textInputField={(textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement}
@@ -34,15 +35,17 @@ One can easily annotate over image in react.js by installing `react-image-annota
         onChange={(data: { [key: string]: any }) => void}
     />
 
+
 `props example`
 
-1. `compIdx`  unique index of the component when using `MNgoImageAnnotate` multiple time in view/screen/oage
-2. `image`  image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
-3. `loc`  loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
-4. `width`  width of the image, default value is 900
-5. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
-6. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
-7. `textInputField`  a function to render Text Tool Input Field
+1. `compMaxHeight`  max height allowed to component (max height component can go to)
+2. `compIdx`  unique index of the component when using `MNgoImageAnnotate` multiple time in view/screen/oage
+3. `image`  image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
+4. `loc`  loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
+5. `imgWidth`  width of the image, default value is 900
+6. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
+7. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
+8. `textInputField`  a function to render Text Tool Input Field,
         e.g.
 
 
@@ -58,7 +61,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
             }
 
 
-8. `shapes`  shape button in tool bar
+9. `shapes`  shape button in tool bar
 
 
             {
@@ -75,7 +78,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
             }
 
 
-9. `annotations` array of annotations present on the image
+10. `annotations` array of annotations present on the image
 
 
             [
@@ -119,11 +122,11 @@ One can easily annotate over image in react.js by installing `react-image-annota
             ]
 
 
-10. `onChange`  callback function run when any change is done on annotations
+11. `onChange`  callback function run when any change is done on annotations
 
         onChange (annotationData: object) => void
 
-        `annotationData` is { width: number, annotations: annotations[]}
+        `annotationData` is { imgWidth: number, annotations: annotations[]}
 
 
 

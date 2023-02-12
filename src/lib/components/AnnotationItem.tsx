@@ -13,16 +13,38 @@ function myDebounce<Params extends any[]>(functionToRun: (...args: Params) => an
     }
 }
 
-function getPosOfAnnot(e: any, compIdx: number, isInFixedContainer: boolean = false) {
+function getPosOfAnnot(e: any, compIdx: number) {
     try {
+        let isInFixedContainer: boolean = false;
+
+        // getting the scroll length of all the parent divs of the component
+        let parent: any = document.getElementById(ANNOTATION_COMP_ID + compIdx)?.parentNode;
+        let htmlScrollX = 0, htmlScrollY = 0;
+        while (parent) {
+            try {
+                //in case of parent's position is fixed, we don't need to go till html tag
+                //so breaking when any parent element with fixed position is found
+                const elePos = getComputedStyle(parent)?.position;
+                isInFixedContainer = (elePos === "fixed");
+                if (isInFixedContainer) break;
+
+                if (parent.tagName === "HTML") break; //breaking when we found html tag
+
+                htmlScrollY += (parent?.scrollTop || 0);
+                htmlScrollX += (parent?.scrollLeft || 0);
+
+                parent = parent.parentNode;
+            } catch { break; }
+        }
+
         const { scrollX, scrollY } = window || {};
 
         const { scrollLeft = 0, scrollTop = 0, offsetLeft: compOffsetLeft = 0, offsetTop: compOffsetTop = 0 } = document.getElementById(ANNOTATION_COMP_ID + compIdx) || {};
         const { offsetLeft: frameOffsetLeft = 0, offsetTop: frameOffsetTop = 0 } = document.getElementById(FRAME_ID + compIdx) || {}; // frame/container offset top & left wrt to its parent
         const { offsetLeft: areaOffsetLeft = 0, offsetTop: areaOffsetTop = 0 } = document.getElementById(AREA_ID + compIdx) || {};
 
-        const newX: number = (e.pageX + scrollLeft - compOffsetLeft - frameOffsetLeft - areaOffsetLeft) - (isInFixedContainer ? scrollX : 0);
-        const newY: number = (e.pageY + scrollTop - compOffsetTop - frameOffsetTop - areaOffsetTop) - (isInFixedContainer ? scrollY : 0);
+        const newX: number = (e.pageX + scrollLeft - compOffsetLeft - frameOffsetLeft - areaOffsetLeft) + htmlScrollX - (isInFixedContainer ? scrollX : 0);
+        const newY: number = (e.pageY + scrollTop - compOffsetTop - frameOffsetTop - areaOffsetTop) + htmlScrollY - (isInFixedContainer ? scrollY : 0);
 
         return { x: newX, y: newY };
     } catch { }
@@ -30,7 +52,6 @@ function getPosOfAnnot(e: any, compIdx: number, isInFixedContainer: boolean = fa
 }
 
 interface AnnotationItemPropsType {
-    isInFixedContainer?: boolean,
     compIdx?: number,
     isSelected?: boolean,
     idx: number,
@@ -41,7 +62,6 @@ interface AnnotationItemPropsType {
     onDeleteClick?: (idx: number) => void,
 }
 export default function AnnotationItem({
-    isInFixedContainer = false,
     compIdx = 0,
     isSelected,
     idx,
@@ -56,7 +76,7 @@ export default function AnnotationItem({
     }
 
     function handleAnnotMoveStart(e: any, idx: number) {
-        const { x, y } = getPosOfAnnot(e, compIdx, isInFixedContainer) || {};
+        const { x, y } = getPosOfAnnot(e, compIdx) || {};
 
         const newX = x - ((item?.size?.width || 0) / 2), newY = y - ((item?.size?.height || 0) / 2);
         if (newX >= 0 && newY >= 0) setAnnot(prev => prev.map((item, i) => ({ ...item, pos: ((i === idx) ? { x: newX, y: newY } : item.pos) })));
@@ -65,7 +85,7 @@ export default function AnnotationItem({
     }
 
     function handleAnnotRotateStart(e: any, idx: number) {
-        const { x: newX, y: newY } = getPosOfAnnot(e, compIdx, isInFixedContainer) || {};
+        const { x: newX, y: newY } = getPosOfAnnot(e, compIdx) || {};
         if (newX >= 0 && newY >= 0) {
             const centerX = (item?.pos?.x || 0) + ((item?.size?.width || 0) / 2), centerY = (item?.pos?.y || 0) + ((item?.size?.height || 0) / 2);
             const rotate: number = Math.atan2(newY - centerY, newX - centerX) * (180 / Math.PI);

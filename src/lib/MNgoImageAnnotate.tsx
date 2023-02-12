@@ -10,9 +10,10 @@ const CORR_FULL_SCR_MODAL = "corrFullScreenModal", TOOL_BAR_HEIGHT = 55, SCROLL_
 
 interface MNgoImageAnnotatePropsType {
     compIdx?: number,
+    compMaxHeight?: string,
     image?: string,
     loc?: number[],
-    width?: number,
+    imgWidth?: number,
     loader?: string | ReactElement,
     error?: string | ReactElement,
     textInputField?: (textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement,
@@ -22,9 +23,10 @@ interface MNgoImageAnnotatePropsType {
 }
 export default function MNgoImageAnnotate({
     compIdx = 0,
+    compMaxHeight,
     image = "",
     loc = [], //loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
-    width = DEFAULT_ANNOT_AREA_WIDTH,
+    imgWidth = DEFAULT_ANNOT_AREA_WIDTH,
     loader = <Loader />,
     error = "Something went wrong",
     textInputField = (textInputVal, setTextInputVal) => {
@@ -63,8 +65,8 @@ export default function MNgoImageAnnotate({
         const imgEle: any = document.createElement("img");
         imgEle.src = image;
         imgEle.onload = function () {
-            setImageDimRatio({ ...imageDimRatio, width: width / imgEle.width });
-            const calcHeight = (width / imgEle.width * imgEle.height) || -400;
+            setImageDimRatio({ ...imageDimRatio, width: imgWidth / imgEle.width });
+            const calcHeight = (imgWidth / imgEle.width * imgEle.height) || -400;
             setHeight(calcHeight);
             setAnnot(annotations);
 
@@ -78,7 +80,7 @@ export default function MNgoImageAnnotate({
                 // calculating the frame's height, width and area's top position, what will be visible
                 const diffY = Math.abs(loc[1] - loc[3]);
                 const diffX = Math.abs(loc[0] - loc[2]);
-                const ratio = diffX / width;
+                const ratio = diffX / imgWidth;
                 setFrameDims({ height: diffY / ratio, top: loc[1] / ratio });
             } else setFrameDims({ ...frameDims, height: calcHeight });
         }
@@ -87,7 +89,7 @@ export default function MNgoImageAnnotate({
 
     useEffect(() => {
         if (height > 10) {
-            if (compLoaded.current && onChange) onChange({ annotations: annot, width });
+            if (compLoaded.current && onChange) onChange({ annotations: annot, imgWidth });
             compLoaded.current = true;
         }
     }, [annot]);
@@ -133,14 +135,15 @@ export default function MNgoImageAnnotate({
         }
     }
 
-    function render(compIdx: number, isInFixedContainer: boolean = false) {
+    function render(compIdx: number) {
         return (
             <div
                 id={ANNOTATION_COMP_ID + compIdx}
-                className={`sa-bg-white sa-overflow-auto sa-select-none sa-relative sa-max-h-[calc(100vh-100px)]`}
+                className={`sa-bg-white sa-overflow-auto sa-select-none sa-relative`}
                 style={{
-                    minWidth: width + SCROLL_BAR_HEIGHT, maxWidth: width + SCROLL_BAR_HEIGHT,
-                    height: frameDims.height + TOOL_BAR_HEIGHT, minHeight: MIN_HEIGHT + TOOL_BAR_HEIGHT
+                    minWidth: imgWidth + SCROLL_BAR_HEIGHT, maxWidth: imgWidth + SCROLL_BAR_HEIGHT,
+                    maxHeight: compMaxHeight || (frameDims.height + TOOL_BAR_HEIGHT),
+                    minHeight: MIN_HEIGHT + TOOL_BAR_HEIGHT
                 }} // SCROLL_BAR_HEIGHT is added to adjust scrollbar width // TOOL_BAR_HEIGHT is added to adjust the tool bar height
             >
                 <AnnotationButtons
@@ -177,12 +180,12 @@ export default function MNgoImageAnnotate({
                 }
 
                 <div id={FRAME_ID + compIdx} className="sa-relative sa-overflow-hidden"
-                    style={{ minWidth: width, maxWidth: width, height: frameDims.height }}
+                    style={{ minWidth: imgWidth, maxWidth: imgWidth, height: frameDims.height }}
                 >
                     <div id={AREA_ID + compIdx} className="sa-relative sa-overflow-hidden"
                         style={{
                             top: -frameDims.top,
-                            minWidth: width, maxWidth: width, height, minHeight: MIN_HEIGHT,
+                            minWidth: imgWidth, maxWidth: imgWidth, height, minHeight: MIN_HEIGHT,
                             backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
                             backgroundImage: (height > 10 ? `url(${image})` : ""),
                             // cursor: `url(${shapes[selectedToolBarBtn]?.img}), auto`,
@@ -197,7 +200,7 @@ export default function MNgoImageAnnotate({
                                     compIdx={compIdx}
                                     imageDimRatio={imageDimRatio}
                                     isDrawable={selectedToolBarBtn === PENCIL_TOOL}
-                                    width={width}
+                                    width={imgWidth}
                                     height={height}
                                     annot={annot}
                                     setAnnot={setAnnot}
@@ -207,7 +210,6 @@ export default function MNgoImageAnnotate({
                         {
                             annot.map((item, idx: number) => (item.type === PENCIL_TOOL || item.ty || item.pts) ? null : //old canvasData from old assessed portal has ty and pts keys which will be handled using canvas not AnnotationItem
                                 <AnnotationItem
-                                    isInFixedContainer={isInFixedContainer}
                                     compIdx={compIdx}
                                     key={idx}
                                     isSelected={idx === selectedAnnot}
@@ -233,7 +235,7 @@ export default function MNgoImageAnnotate({
                 hideTitle={modalData.hideTitle}
                 onClose={() => { setModalData(prev => ({ ...prev, isOpen: false })) }}
             >
-                <>{modalData.type === CORR_FULL_SCR_MODAL ? <>{render(-1, true)}</> : null}</>
+                <>{modalData.type === CORR_FULL_SCR_MODAL ? <>{render(-1)}</> : null}</>
             </Modal>
 
             {render(compIdx)}
