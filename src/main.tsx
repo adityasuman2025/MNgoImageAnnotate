@@ -26,18 +26,20 @@ function Main() {
     return (
         <>
             <div style={{ background: "#f1f1f1", height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span>Upload Image </span>
-                <input type="file"
-                    onChange={async (e) => {
-                        const file = e?.target?.files?.[0];
-                        if (file) {
-                            const base64Img = await blobToBase64(file);
+                <label>Upload Image
+                    <input type="file" name="uploadImage"
+                        accept="image/png, image/gif, image/jpeg"
+                        onChange={async (e) => {
+                            const file = e?.target?.files?.[0];
+                            if (file) {
+                                const base64Img = await blobToBase64(file);
 
-                            localStorage.setItem("annotImg", base64Img); // storing image in localStorage
-                            location.reload();
-                        }
-                    }}
-                />
+                                localStorage.setItem("annotImg", base64Img); // storing image in localStorage
+                                location.reload();
+                            }
+                        }}
+                    />
+                </label>
             </div>
             <br />
 
