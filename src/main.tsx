@@ -5,7 +5,7 @@ import { MNgoImageAnnotate } from "./lib";
 import tickShape from "./tickShape.svg";
 import crossShape from "./crossShape.svg";
 import qstnShape from "./qstnShape.svg";
-import img from "./img.png";
+import img from "./img.jpg";
 
 function blobToBase64(blob: any): any {
     return new Promise((resolve, _) => {
@@ -47,7 +47,7 @@ function Main() {
                 // compMaxHeight={"calc(100vh)"}
                 image={annotImg || img} //"https://tinypng.com/images/social/website.jpg"
                 // loc={[0, 857, 1620, 1825]}
-                imgWidth={annotationData.imgWidth}
+                imgWidth={annotationData.imgWidth || window.innerWidth - 20}
                 textInputField={(textInputVal, setTextInputVal) => {
                     return (
                         <textarea
