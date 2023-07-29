@@ -117,8 +117,8 @@ export default function AnnotationItem({
                             backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
                             ...(type === TEXT_TOOL ? {} : { backgroundImage: `url(${annotationImg})` }),
                         } as CSSProperties}
-                        onDrag={(e) => myDebounce(handleAnnotMoveStart, 100)(e, idx)}
-                        onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 100)(e)}
+                        onDrag={(e) => myDebounce(handleAnnotMoveStart, 180)(e, idx)}
+                        onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 180)(e)}
                         draggable={true}
                         {...(type === TEXT_TOOL ? { dangerouslySetInnerHTML: { __html: html || "" } } : {})} //if type is text tool then rendering the html 
                     />
@@ -130,8 +130,8 @@ export default function AnnotationItem({
                             <img
                                 className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[yellowgreen] sa-top-[-40px] sa-cursor-grab`}
                                 src={rotateIcon} alt={"rotateIcon"}
-                                onDrag={(e) => myDebounce(handleAnnotRotateStart, 100)(e, idx)}
-                                onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 100)(e)}
+                                onDrag={(e) => myDebounce(handleAnnotRotateStart, 180)(e, idx)}
+                                onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 180)(e)}
                             />
                             <img
                                 className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[red] sa-bottom-[-40px] sa-cursor-pointer sa-drag-none`}
