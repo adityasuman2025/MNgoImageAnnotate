@@ -1,6 +1,6 @@
 {
   "name": "react-image-annotate-mngo",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "sideEffects": false,
   "private": false,
   "type": "module",
@@ -26,8 +26,8 @@
   "scripts": {
     "start": "concurrently \"npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --watch\" \"vite\" ",
     "build": "npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --minify && tsc && IS_DEPL=true vite build",
-    "babel-build": "rm -rf dist && npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --minify && tsc && vite build",
-    "build-publish": "npm run babel-build && npm publish",
+    "lib-build": "rm -rf dist && npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --minify && tsc && vite build",
+    "build-publish": "npm run lib-build && npm publish",
     "demo": "cd demo && rm -rf node_modules && npm install && npm start"
   },
   "dependencies": {

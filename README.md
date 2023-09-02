@@ -1,26 +1,26 @@
 # react-image-annotate-mngo
+
 This library is available at [react-image-annotate-mngo](https://www.npmjs.com/package/react-image-annotate-mngo)
 
-
 ## Demo
-[annotate.mngo.in](https://annotate.mngo.in)
 
+[annotate.mngo.in](https://annotate.mngo.in)
 
 ## Brief:
 
 A JavaScript React Library (npm package ) which provides an area over an image to annotation/markup/write.
 One can easily annotate over image in react.js by installing `react-image-annotate-mngo` package
 
-
 ## Screenshots:
+
 <img src="screenshots/1.png" alt="screenshot 1">
 
 <img src="screenshots/2.png" alt="screenshot 2">
 
 <img src="screenshots/3.png" alt="screenshot 3">
 
-
 ## Usage
+
     <MNgoImageAnnotate
         compMaxHeight={string}
         compIdx={number}
@@ -35,19 +35,17 @@ One can easily annotate over image in react.js by installing `react-image-annota
         onChange={(data: { [key: string]: any }) => void}
     />
 
-
 `props example`
 
-1. `compMaxHeight`  max height allowed to component (max height component can go to)
-2. `compIdx`  unique index of the component when using `MNgoImageAnnotate` multiple time in view/screen/oage
-3. `image`  image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
-4. `loc`  loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
-5. `imgWidth`  width of the image, default value is 900
-6. `loader`  ReactElement or string to display while image is loading/downloading, default value is "loading"
-7. `error`  ReactElement or string to display when image could not be loaded, default value is "something went wrong"
-8. `textInputField`  a function to render Text Tool Input Field,
-        e.g.
-
+1.  `compMaxHeight` max height allowed to component (max height component can go to)
+2.  `compIdx` unique index of the component when using `MNgoImageAnnotate` multiple time in view/screen/oage
+3.  `image` image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
+4.  `loc` loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
+5.  `imgWidth` width of the image, default value is 900
+6.  `loader` ReactElement or string to display while image is loading/downloading, default value is "loading"
+7.  `error` ReactElement or string to display when image could not be loaded, default value is "something went wrong"
+8.  `textInputField` a function to render Text Tool Input Field,
+    e.g.
 
             function (textInputVal, setTextInputVal) => {
                 return (
@@ -60,9 +58,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 )
             }
 
-
-9. `shapes`  shape button in tool bar
-
+9.  `shapes` shape button in tool bar
 
             {
                 <shape type | title>: { btnIcon: <string | Image>, img: <string | Image> },
@@ -77,9 +73,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 cross: { btnIcon: crossShape, img: crossShape },
             }
 
-
 10. `annotations` array of annotations present on the image
-
 
             [
                 {
@@ -121,20 +115,16 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 }
             ]
 
-
-11. `onChange`  callback function run when any change is done on annotations
+11. `onChange` callback function run when any change is done on annotations
 
         onChange (annotationData: object) => void
 
         `annotationData` is { imgWidth: number, annotations: annotations[]}
 
-
-
 ## Installation
 
 1. npm install
 2. npm start
-
 
 ## Available Scripts
 
@@ -143,9 +133,9 @@ In the project directory, you can run
 ### `npm start`
 
 Runs the app in the development mode
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
 
-### `npm run babel-build`
+### `npm run lib-build`
 
 it is for final package build which create `dist` folder.
 
@@ -153,7 +143,7 @@ it is for final package build which create `dist` folder.
 
 to publish the project on npm
 
-`Note`: do `npm run babel-build` before `npm publish` because it publishes dist folder as defined as key main, module, files in package.json, and do not forget to login in npm using `npm login`
+`Note`: do `npm run lib-build` before `npm publish` because it publishes dist folder as defined as key main, module, files in package.json, and do not forget to login in npm using `npm login`
 
 ### `npm run build-publish`
 
