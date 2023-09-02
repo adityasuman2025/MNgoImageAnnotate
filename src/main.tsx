@@ -2,10 +2,17 @@ import React from "react";
 import ReactDOM from 'react-dom/client';
 import { MNgoImageAnnotate } from "./lib";
 
+import squareShape from "./squareShape.svg";
+import rectShape from "./rectShape.svg";
+import circleShape from "./circleShape.svg";
+import dbShape from "./dbShape.svg";
+import cloudShape from "./cloudShape.svg";
+import houseShape from "./houseShape.svg";
 import tickShape from "./tickShape.svg";
 import crossShape from "./crossShape.svg";
 import qstnShape from "./qstnShape.svg";
 import img from "./img.jpg";
+
 
 function blobToBase64(blob: any): any {
     return new Promise((resolve, _) => {
@@ -59,9 +66,16 @@ function Main() {
                     )
                 }}
                 shapes={{
+                    square: { btnIcon: squareShape, img: squareShape },
+                    rect: { btnIcon: rectShape, img: rectShape },
+                    circle: { btnIcon: circleShape, img: circleShape },
+                    db: { btnIcon: dbShape, img: dbShape },
+                    cloudShape: { btnIcon: cloudShape, img: cloudShape },
+                    houseShape: { btnIcon: houseShape, img: houseShape },
                     tick: { btnIcon: tickShape, img: tickShape },
                     cross: { btnIcon: crossShape, img: crossShape },
                     question: { btnIcon: qstnShape, img: qstnShape },
+
                 }}
                 annotations={annotationData.annotations}
                 onChange={handleChange}

@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
 import { AREA_ID, ANNOTATION_COMP_ID, PENCIL_TOOL } from "../constants";
 
-const LINE_WIDTH = 3;
+const LINE_WIDTH = 4;
 
 function oldCanvasDataRenderer(fig: { [key: string]: any }, canvasCtx: any, ratio: number) {
     try {
