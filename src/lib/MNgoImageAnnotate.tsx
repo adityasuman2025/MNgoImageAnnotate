@@ -1,13 +1,12 @@
 import React, { useEffect, useState, CSSProperties, ReactElement, useRef, Dispatch, SetStateAction } from "react";
-import html2canvas from 'html2canvas';
-import { AnnotationButtons, AnnotationItem, Canvas, Modal, Loader } from "./components";
+import { AnnotationButtons, AnnotationItem, Canvas, Loader } from "./components";
 import {
     MIN_HEIGHT, DEFAULT_ANNOT_AREA_WIDTH, FRAME_ID, AREA_ID, ANNOTATION_COMP_ID,
-    PENCIL_TOOL, CAPTURE_TOOL, UNDO_TOOL, REDO_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL
+    PENCIL_TOOL, UNDO_TOOL, REDO_TOOL, TEXT_TOOL, FULL_SCREEN_TOOL
 } from "./constants";
 import "./index.css";
 
-const CORR_FULL_SCR_MODAL = "corrFullScreenModal", TOOL_BAR_HEIGHT = 55, SCROLL_BAR_HEIGHT = 20;
+const TOOL_BAR_HEIGHT = 55, SCROLL_BAR_HEIGHT = 20;
 
 interface MNgoImageAnnotatePropsType {
     compIdx?: number,
@@ -52,7 +51,6 @@ export default function MNgoImageAnnotate({
 
     const [isCanvasRendered, setIsCanvasRendered] = useState<boolean>(false);
     const [mousePos, setMousePos] = useState<{ [key: string]: any }>({ x: 0, y: 0 });
-    const [modalData, setModalData] = useState<{ [key: string]: any }>({ isOpen: false, hideTitle: true });
     const [selectedToolBarBtn, setSelectedToolBarBtn] = useState<string>("");
     const [textToolContent, setTextToolContent] = useState<string>("");
 
@@ -136,17 +134,14 @@ export default function MNgoImageAnnotate({
         }
     }
 
-    function captureSS() {
-        html2canvas(document.getElementById(FRAME_ID + compIdx) || document.body)
-            .then(function (canvas) {
-                const dataURL = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
-
-                var link = document.createElement("a");
-                link.setAttribute('download', `MNgoImageAnnotate-${new Date().getTime()}.png`);
-                link.setAttribute('href', dataURL);
-                link.click();
-            })
-            .catch(e => { console.log("failed to capture screenshot", e) });
+    function toggleFullScreen() {
+        try {
+            if (!document?.fullscreenElement) {
+                document?.documentElement?.requestFullscreen();
+            } else if (document?.exitFullscreen) {
+                document?.exitFullscreen();
+            }
+        } catch (e) { console.log("failed to toggle full screen", e) }
     }
 
     function render(compIdx: number) {
@@ -167,15 +162,9 @@ export default function MNgoImageAnnotate({
                     isUndoEnabled={annot.length ? true : false}
                     selectedTool={selectedToolBarBtn}
                     onToolClick={(tool) => {
-                        if ([UNDO_TOOL, REDO_TOOL].includes(tool)) {
-                            handleUndoClick(tool === REDO_TOOL ? true : false);
-                        } else if (tool === CAPTURE_TOOL) {
-                            captureSS();
-                        } else if (tool === FULL_SCREEN_TOOL) {
-                            setModalData({ isOpen: true, type: CORR_FULL_SCR_MODAL, hideTitle: true });
-                        } else {
-                            setSelectedToolBarBtn(tool);
-                        }
+                        if ([UNDO_TOOL, REDO_TOOL].includes(tool)) handleUndoClick(tool === REDO_TOOL);
+                        else if (tool === FULL_SCREEN_TOOL) toggleFullScreen();
+                        else setSelectedToolBarBtn(tool);
                     }}
                 />
 
@@ -245,16 +234,6 @@ export default function MNgoImageAnnotate({
     }
 
     return (
-        <div className="sa">
-            <Modal
-                open={modalData.isOpen}
-                hideTitle={modalData.hideTitle}
-                onClose={() => { setModalData(prev => ({ ...prev, isOpen: false })) }}
-            >
-                <>{modalData.type === CORR_FULL_SCR_MODAL ? <>{render(-1)}</> : null}</>
-            </Modal>
-
-            {render(compIdx)}
-        </div>
+        <div className="sa">{render(compIdx)}</div>
     );
 }
