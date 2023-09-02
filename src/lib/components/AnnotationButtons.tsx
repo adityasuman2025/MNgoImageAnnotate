@@ -4,7 +4,7 @@ import { undoToolIcon, redoToolIcon, pencilToolIcon, textToolIcon, fullScrToolIc
 
 const TOOL_STYLE = "sa-ml-[16px] sa-p-[3px] sa-flex sa-items-center sa-justify-center sa-cursor-pointer sa-rounded-full";
 const SELECTED_TOOL_STYLE = "sa-shadow sa-bg-neutral-200 sa-border-[0.5px] sa-border-solid sa-border-stone-300";
-const DISABLED_TOOL_STYLE = "sa-pointer-events-none sa-opacity-20";
+const DISABLED_TOOL_STYLE = "sa-pointer-events-none sa-opacity-50";
 const TOOL_WIDTH = 12;
 
 const DEFAULT_TOOLS: { [key: string]: any } = {
@@ -29,7 +29,7 @@ export default function AnnotationButtons({
     onToolClick,
 }: AnnotationButtonsPropsType) {
     return (
-        <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] ${isLoading ? "sa-pointer-events-none sa-opacity-20" : ""}`}>
+        <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] sa-max-w-full sa-overflow-x-auto ${isLoading ? "sa-pointer-events-none sa-opacity-20" : ""}`}>
             <div className={`sa-flex sa-items-center sa-justify-left`}>
                 <div className={`sa-mr-[16px] sa-cursor-pointer ${isUndoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(UNDO_TOOL)}>
                     <img src={undoToolIcon} width={TOOL_WIDTH + 2} height={TOOL_WIDTH + 2} alt="tool" />

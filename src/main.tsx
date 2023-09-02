@@ -67,7 +67,6 @@ function Main() {
 
                 <button onClick={captureSS}>Save Image</button>
             </div>
-            <br />
 
             <MNgoImageAnnotate
                 compIdx={COMP_IDX}
