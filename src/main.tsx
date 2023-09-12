@@ -93,7 +93,7 @@ function Main() {
                 // loc={[0, 857, 1620, 1825]}
                 imgWidth={annotationData.imgWidth || window.innerWidth - 20}
 
-                // isDarkMode={isDarkMode}
+                isDarkMode={isDarkMode}
 
                 shapes={{
                     square: { btnIcon: squareShape, img: squareShape },
