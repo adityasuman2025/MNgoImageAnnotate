@@ -13,6 +13,7 @@ const DEFAULT_TOOLS: { [key: string]: any } = {
 }
 
 interface AnnotationButtonsPropsType {
+    isDarkMode?: boolean,
     isLoading?: boolean,
     shapes?: { [key: string]: any },
     isRedoEnabled: boolean,
@@ -21,6 +22,7 @@ interface AnnotationButtonsPropsType {
     onToolClick: (type: string) => void,
 }
 export default function AnnotationButtons({
+    isDarkMode = false,
     isLoading = true,
     shapes = {},
     isRedoEnabled,
@@ -29,7 +31,7 @@ export default function AnnotationButtons({
     onToolClick,
 }: AnnotationButtonsPropsType) {
     return (
-        <div className={`sa-sticky sa-top-0 sa-z-10 sa-bg-white sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] sa-max-w-full sa-overflow-x-auto ${isLoading ? "sa-pointer-events-none sa-opacity-20" : ""}`}>
+        <div className={`${isDarkMode ? "sa-bg-slate-900" : "sa-bg-white"} sa-sticky sa-top-0 sa-z-10 sa-flex sa-items-center sa-justify-between sa-shadow sa-border-neutral-100 sa-border-solid sa-border-0 sa-border-y-[1px] sa-py-[16px] sa-px-[24px] sa-max-w-full sa-overflow-x-auto ${isLoading ? "sa-pointer-events-none sa-opacity-20" : ""}`}>
             <div className={`sa-flex sa-items-center sa-justify-left`}>
                 <div className={`sa-mr-[16px] sa-cursor-pointer ${isUndoEnabled ? "" : DISABLED_TOOL_STYLE}`} onClick={() => onToolClick(UNDO_TOOL)}>
                     <img src={undoToolIcon} width={TOOL_WIDTH + 2} height={TOOL_WIDTH + 2} alt="tool" />

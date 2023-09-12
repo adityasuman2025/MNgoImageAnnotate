@@ -27,6 +27,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
         image={string | Image}
         loc={number[]}
         imgWidth={number}
+        isDarkMode={boolean}
         loader={string | ReactElement}
         error={string | ReactElement}
         textInputField={(textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement}
@@ -42,9 +43,10 @@ One can easily annotate over image in react.js by installing `react-image-annota
 3.  `image` image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
 4.  `loc` loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
 5.  `imgWidth` width of the image, default value is 900
-6.  `loader` ReactElement or string to display while image is loading/downloading, default value is "loading"
-7.  `error` ReactElement or string to display when image could not be loaded, default value is "something went wrong"
-8.  `textInputField` a function to render Text Tool Input Field,
+6.  `isDarkMode` to enable dark mode?, default value is false
+7.  `loader` ReactElement or string to display while image is loading/downloading, default value is "loading"
+8.  `error` ReactElement or string to display when image could not be loaded, default value is "something went wrong"
+9.  `textInputField` a function to render Text Tool Input Field,
     e.g.
 
             function (textInputVal, setTextInputVal) => {
@@ -58,7 +60,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 )
             }
 
-9.  `shapes` shape button in tool bar
+10. `shapes` shape button in tool bar
 
             {
                 <shape type | title>: { btnIcon: <string | Image>, img: <string | Image> },
@@ -73,7 +75,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 cross: { btnIcon: crossShape, img: crossShape },
             }
 
-10. `annotations` array of annotations present on the image
+11. `annotations` array of annotations present on the image
 
             [
                 {
@@ -115,7 +117,7 @@ One can easily annotate over image in react.js by installing `react-image-annota
                 }
             ]
 
-11. `onChange` callback function run when any change is done on annotations
+12. `onChange` callback function run when any change is done on annotations
 
         onChange (annotationData: object) => void
 

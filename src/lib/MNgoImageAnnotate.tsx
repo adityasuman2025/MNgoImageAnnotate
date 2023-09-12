@@ -14,6 +14,7 @@ interface MNgoImageAnnotatePropsType {
     image?: string,
     loc?: number[],
     imgWidth?: number,
+    isDarkMode?: boolean,
     loader?: string | ReactElement,
     error?: string | ReactElement,
     textInputField?: (textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement,
@@ -27,6 +28,7 @@ export default function MNgoImageAnnotate({
     image = "",
     loc = [], //loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
     imgWidth = DEFAULT_ANNOT_AREA_WIDTH,
+    isDarkMode = false,
     loader = <Loader />,
     error = "Something went wrong",
     textInputField = (textInputVal, setTextInputVal) => {
@@ -148,7 +150,7 @@ export default function MNgoImageAnnotate({
         return (
             <div
                 id={ANNOTATION_COMP_ID + compIdx}
-                className={`sa-bg-white sa-overflow-auto sa-select-none sa-relative`}
+                className={`${isDarkMode ? "sa-bg-slate-900" : "sa-bg-white"} sa-overflow-auto sa-select-none sa-relative`}
                 style={{
                     minWidth: imgWidth + SCROLL_BAR_HEIGHT, maxWidth: imgWidth + SCROLL_BAR_HEIGHT,
                     maxHeight: compMaxHeight || (frameDims.height + TOOL_BAR_HEIGHT),
@@ -156,6 +158,7 @@ export default function MNgoImageAnnotate({
                 }} // SCROLL_BAR_HEIGHT is added to adjust scrollbar width // TOOL_BAR_HEIGHT is added to adjust the tool bar height
             >
                 <AnnotationButtons
+                    isDarkMode={isDarkMode}
                     isLoading={height <= 10}
                     shapes={shapes}
                     isRedoEnabled={undoAnnot.length ? true : false}

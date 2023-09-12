@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from 'react-dom/client';
 import { MNgoImageAnnotate } from "./lib";
 
@@ -11,7 +11,9 @@ import houseShape from "./houseShape.svg";
 import tickShape from "./tickShape.svg";
 import crossShape from "./crossShape.svg";
 import qstnShape from "./qstnShape.svg";
-import img from "./img.jpg";
+
+import lightImg from "./img.jpg";
+import darkImg from "./img2.jpg";
 
 
 function blobToBase64(blob: any): any {
@@ -24,9 +26,18 @@ function blobToBase64(blob: any): any {
 
 const annotationData = JSON.parse(localStorage.getItem("annotData") || "{}");
 const annotImg = localStorage.getItem("annotImg");
+const isDark = localStorage.getItem("isDark");
 const COMP_IDX = 0, FRAME_ID = "frame";
 
 function Main() {
+    const [isDarkMode, setIsDarkMode] = useState(isDark === "true" ? true : false);
+
+    useEffect(() => {
+        document.body.style.background = isDarkMode ? "rgb(15 23 42)" : "#f1f1f1";
+
+        localStorage.setItem("isDark", String(isDarkMode)); //storing annotations in localStorage
+    }, [isDarkMode]);
+
     function handleChange(annotData: { [key: string]: any }) {
         localStorage.setItem("annotData", JSON.stringify(annotData)); //storing annotations in localStorage
     }
@@ -49,8 +60,9 @@ function Main() {
 
     return (
         <>
-            <div style={{ background: "#f1f1f1", height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <label>Upload Image
+            <div style={{ height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <label>
+                    <span style={{ color: "grey" }}>Upload Image </span>
                     <input type="file" name="uploadImage"
                         accept="image/png, image/gif, image/jpeg"
                         onChange={async (e) => {
@@ -66,14 +78,22 @@ function Main() {
                 </label>
 
                 <button onClick={captureSS}>Save Image</button>
+
+                <div style={{ marginLeft: 100 }}>
+                    <button onClick={() => setIsDarkMode(prev => !prev)}>
+                        {isDarkMode ? "light" : "dark"} mode
+                    </button>
+                </div>
             </div>
 
             <MNgoImageAnnotate
                 compIdx={COMP_IDX}
-                // compMaxHeight={"calc(100vh)"}
-                image={annotImg || img} //"https://tinypng.com/images/social/website.jpg"
+                compMaxHeight={(window.innerHeight - 50 + 'px') || "calc(100vh)"}
+                image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
                 // loc={[0, 857, 1620, 1825]}
                 imgWidth={annotationData.imgWidth || window.innerWidth - 20}
+
+                // isDarkMode={isDarkMode}
 
                 shapes={{
                     square: { btnIcon: squareShape, img: squareShape },
