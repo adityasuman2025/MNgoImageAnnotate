@@ -11,7 +11,6 @@ import houseShape from "./houseShape.svg";
 import tickShape from "./tickShape.svg";
 import crossShape from "./crossShape.svg";
 import qstnShape from "./qstnShape.svg";
-
 import lightImg from "./img.jpg";
 import darkImg from "./img2.jpg";
 
@@ -24,13 +23,18 @@ function blobToBase64(blob: any): any {
     });
 }
 
-const annotationData = JSON.parse(localStorage.getItem("annotData") || "{}");
+const tabsAnnotationData = JSON.parse(localStorage.getItem("tabsAnnotData") || "{}");
 const annotImg = localStorage.getItem("annotImg");
 const isDark = localStorage.getItem("isDark");
 const COMP_IDX = 0, FRAME_ID = "frame";
 
 function Main() {
-    const [isDarkMode, setIsDarkMode] = useState(isDark === "true" ? true : false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(isDark === "true" ? true : false);
+    const [tabCount, setTabCount] = useState<number>(Object.keys(tabsAnnotationData).length || 1);
+    const [activeTab, setActiveTab] = useState<number>(1);
+    const [annotData, setAnnotData] = useState<{ [key: string]: any }>(tabsAnnotationData);
+
 
     useEffect(() => {
         document.body.style.background = isDarkMode ? "rgb(15 23 42)" : "#f1f1f1";
@@ -38,8 +42,18 @@ function Main() {
         localStorage.setItem("isDark", String(isDarkMode)); //storing annotations in localStorage
     }, [isDarkMode]);
 
-    function handleChange(annotData: { [key: string]: any }) {
-        localStorage.setItem("annotData", JSON.stringify(annotData)); //storing annotations in localStorage
+    useEffect(() => {
+        setIsLoading(true);
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 100);
+    }, [activeTab]);
+
+    function handleChange(annots: { [key: string]: any }) {
+        console.log("handleChange")
+        const newAnnotData = { ...annotData, [activeTab]: annots };
+        setAnnotData(newAnnotData);
+        localStorage.setItem("tabsAnnotData", JSON.stringify(newAnnotData)); //storing annotations in localStorage
     }
 
     function captureSS() {
@@ -86,30 +100,80 @@ function Main() {
                 </div>
             </div>
 
-            <MNgoImageAnnotate
-                compIdx={COMP_IDX}
-                compMaxHeight={(window.innerHeight - 50 + 'px') || "calc(100vh)"}
-                image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
-                // loc={[0, 857, 1620, 1825]}
-                imgWidth={annotationData.imgWidth || window.innerWidth - 20}
+            <div style={{ height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {
+                    Array(tabCount).fill(0).map((_, idx) => (
+                        <div
+                            key={idx}
+                            style={{
+                                display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, padding: "2px 10px", borderRadius: 5, cursor: "pointer",
+                                border: activeTab === idx + 1 ? "1px solid #ccc" : "1px solid transparent",
+                                background: activeTab === idx + 1 ? "white" : "grey",
+                                opacity: activeTab === idx + 1 ? 1 : 0.5
+                            }}
+                            onClick={() => {
+                                setActiveTab(idx + 1);
+                            }}
+                        >
+                            <span style={{ marginRight: 5, fontSize: "90%" }}> {`tab ${idx + 1}`}</span>
+                            <button onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTab(1);
 
-                isDarkMode={isDarkMode}
+                                setTabCount(prev => {
+                                    setAnnotData(prevAnnotData => {
+                                        const newAnnotData = Object.keys(prevAnnotData).reduce((acc: any, key: any, annoIdx) => {
+                                            if (Number(key) !== Number(idx + 1)) acc[annoIdx] = prevAnnotData[key];
+                                            return acc;
+                                        }, {});
 
-                shapes={{
-                    square: { btnIcon: squareShape, img: squareShape },
-                    rect: { btnIcon: rectShape, img: rectShape },
-                    circle: { btnIcon: circleShape, img: circleShape },
-                    db: { btnIcon: dbShape, img: dbShape },
-                    cloudShape: { btnIcon: cloudShape, img: cloudShape },
-                    houseShape: { btnIcon: houseShape, img: houseShape },
-                    tick: { btnIcon: tickShape, img: tickShape },
-                    cross: { btnIcon: crossShape, img: crossShape },
-                    question: { btnIcon: qstnShape, img: qstnShape },
+                                        localStorage.setItem("tabsAnnotData", JSON.stringify(newAnnotData)); //storing annotations in localStorage
+                                        return newAnnotData;
+                                    });
 
-                }}
-                annotations={annotationData.annotations}
-                onChange={handleChange}
-            />
+                                    return prev - 1;
+                                });
+                            }}>x</button>
+                        </div>
+                    ))
+                }
+
+                <button onClick={() => {
+                    setTabCount(prev => {
+                        setActiveTab(prev + 1);
+                        return prev + 1;
+                    });
+
+                }}>+</button>
+            </div>
+
+            {
+                isLoading ? "loading..." :
+                    <MNgoImageAnnotate
+                        compIdx={COMP_IDX}
+                        compMaxHeight={(window.innerHeight - 90 + 'px') || "calc(100vh)"}
+                        image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
+                        // loc={[0, 857, 1620, 1825]}
+                        imgWidth={annotData[activeTab]?.imgWidth || window.innerWidth - 20}
+
+                        isDarkMode={isDarkMode}
+
+                        shapes={{
+                            square: { btnIcon: squareShape, img: squareShape },
+                            rect: { btnIcon: rectShape, img: rectShape },
+                            circle: { btnIcon: circleShape, img: circleShape },
+                            db: { btnIcon: dbShape, img: dbShape },
+                            cloudShape: { btnIcon: cloudShape, img: cloudShape },
+                            houseShape: { btnIcon: houseShape, img: houseShape },
+                            tick: { btnIcon: tickShape, img: tickShape },
+                            cross: { btnIcon: crossShape, img: crossShape },
+                            question: { btnIcon: qstnShape, img: qstnShape },
+
+                        }}
+                        annotations={annotData[activeTab]?.annotations || []}
+                        onChange={handleChange}
+                    />
+            }
         </>
     )
 }
