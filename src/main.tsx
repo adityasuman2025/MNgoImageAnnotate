@@ -11,7 +11,6 @@ import houseShape from "./houseShape.svg";
 import tickShape from "./tickShape.svg";
 import crossShape from "./crossShape.svg";
 import qstnShape from "./qstnShape.svg";
-
 import lightImg from "./img.jpg";
 import darkImg from "./img2.jpg";
 
@@ -24,13 +23,17 @@ function blobToBase64(blob: any): any {
     });
 }
 
-const annotationData = JSON.parse(localStorage.getItem("annotData") || "{}");
+const ts = new Date().getTime();
+const tabsAnnotationData = JSON.parse(localStorage.getItem("tabsAnnotData") || "{\"" + ts + "\":{}}");
 const annotImg = localStorage.getItem("annotImg");
 const isDark = localStorage.getItem("isDark");
 const COMP_IDX = 0, FRAME_ID = "frame";
 
 function Main() {
-    const [isDarkMode, setIsDarkMode] = useState(isDark === "true" ? true : false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(isDark === "true" ? true : false);
+    const [activeTabId, setActiveTabId] = useState<string>(Object.keys(tabsAnnotationData)[0]);
+    const [annotData, setAnnotData] = useState<{ [key: string]: any }>(tabsAnnotationData);
 
     useEffect(() => {
         document.body.style.background = isDarkMode ? "rgb(15 23 42)" : "#f1f1f1";
@@ -38,8 +41,15 @@ function Main() {
         localStorage.setItem("isDark", String(isDarkMode)); //storing annotations in localStorage
     }, [isDarkMode]);
 
-    function handleChange(annotData: { [key: string]: any }) {
-        localStorage.setItem("annotData", JSON.stringify(annotData)); //storing annotations in localStorage
+    useEffect(() => {
+        setIsLoading(true);
+        setTimeout(() => { setIsLoading(false) }, 100);
+    }, [activeTabId]);
+
+    function handleChange(annots: { [key: string]: any }) {
+        const newAnnotData = { ...annotData, [activeTabId]: annots };
+        setAnnotData(newAnnotData);
+        localStorage.setItem("tabsAnnotData", JSON.stringify(newAnnotData)); //storing annotations in localStorage
     }
 
     function captureSS() {
@@ -86,30 +96,85 @@ function Main() {
                 </div>
             </div>
 
-            <MNgoImageAnnotate
-                compIdx={COMP_IDX}
-                compMaxHeight={(window.innerHeight - 50 + 'px') || "calc(100vh)"}
-                image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
-                // loc={[0, 857, 1620, 1825]}
-                imgWidth={annotationData.imgWidth || window.innerWidth - 20}
+            <div style={{ height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {
+                    Object.keys(annotData).map((tabId, idx) => (
+                        <div
+                            key={tabId}
+                            style={{
+                                display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, height: 25, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "1px solid #ccc",
+                                background: activeTabId === tabId ? "white" : "grey",
+                                opacity: activeTabId === tabId ? 1 : 0.5
+                            }}
+                            onClick={() => setActiveTabId(tabId)}
+                        >
+                            <span style={{ fontSize: "90%" }}> {`tab ${idx + 1}`}</span>
 
-                isDarkMode={isDarkMode}
+                            {
+                                idx > 0 && <div
+                                    style={{ cursor: "pointer", marginLeft: 10, borderRadius: "100%", width: 12, height: 12, background: "rgb(236, 104, 94)" }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setAnnotData(prevAnnotData => {
+                                            let prevTabId: string = "", hasBeenFound = false;
+                                            const newAnnotData = Object.keys(prevAnnotData).reduce((acc: any, key) => {
+                                                if (key !== tabId) acc[key] = prevAnnotData[key];
+                                                else hasBeenFound = true;
 
-                shapes={{
-                    square: { btnIcon: squareShape, img: squareShape },
-                    rect: { btnIcon: rectShape, img: rectShape },
-                    circle: { btnIcon: circleShape, img: circleShape },
-                    db: { btnIcon: dbShape, img: dbShape },
-                    cloudShape: { btnIcon: cloudShape, img: cloudShape },
-                    houseShape: { btnIcon: houseShape, img: houseShape },
-                    tick: { btnIcon: tickShape, img: tickShape },
-                    cross: { btnIcon: crossShape, img: crossShape },
-                    question: { btnIcon: qstnShape, img: qstnShape },
+                                                if (!hasBeenFound) prevTabId = key;
+                                                return acc;
+                                            }, {});
+                                            localStorage.setItem("tabsAnnotData", JSON.stringify(newAnnotData)); //storing annotations in localStorage
 
-                }}
-                annotations={annotationData.annotations}
-                onChange={handleChange}
-            />
+                                            if (tabId === activeTabId) setActiveTabId(prevTabId); // if deleting the active tab
+
+                                            return newAnnotData;
+                                        });
+                                    }}
+                                ></div>
+                            }
+                        </div>
+                    ))
+                }
+
+                <div
+                    style={{
+                        display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, height: 25, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "1px solid #ccc", background: "white",
+                    }}
+                    onClick={() => {
+                        const newTabId = String(new Date().getTime());
+                        setAnnotData(prevAnnotData => ({ ...prevAnnotData, [newTabId]: {} }));
+                        setActiveTabId(newTabId);
+                    }}>+</div>
+            </div>
+
+            {
+                isLoading ? "loading..." :
+                    <MNgoImageAnnotate
+                        compIdx={COMP_IDX}
+                        compMaxHeight={(window.innerHeight - 90 + 'px') || "calc(100vh)"}
+                        image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
+                        // loc={[0, 857, 1620, 1825]}
+                        imgWidth={annotData[activeTabId]?.imgWidth || window.innerWidth - 20}
+
+                        isDarkMode={isDarkMode}
+
+                        shapes={{
+                            square: { btnIcon: squareShape, img: squareShape },
+                            rect: { btnIcon: rectShape, img: rectShape },
+                            circle: { btnIcon: circleShape, img: circleShape },
+                            db: { btnIcon: dbShape, img: dbShape },
+                            cloudShape: { btnIcon: cloudShape, img: cloudShape },
+                            houseShape: { btnIcon: houseShape, img: houseShape },
+                            tick: { btnIcon: tickShape, img: tickShape },
+                            cross: { btnIcon: crossShape, img: crossShape },
+                            question: { btnIcon: qstnShape, img: qstnShape },
+
+                        }}
+                        annotations={annotData[activeTabId]?.annotations || []}
+                        onChange={handleChange}
+                    />
+            }
         </>
     )
 }
