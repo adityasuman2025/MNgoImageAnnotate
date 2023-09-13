@@ -24,6 +24,7 @@ function blobToBase64(blob: any): any {
 }
 
 const ts = new Date().getTime();
+const lastActiveTabId = localStorage.getItem("activeTabId");
 const tabsAnnotationData = JSON.parse(localStorage.getItem("tabsAnnotData") || "{\"" + ts + "\":{}}");
 const annotImg = localStorage.getItem("annotImg");
 const isDark = localStorage.getItem("isDark");
@@ -32,18 +33,20 @@ const COMP_IDX = 0, FRAME_ID = "frame";
 function Main() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDarkMode, setIsDarkMode] = useState<boolean>(isDark === "true" ? true : false);
-    const [activeTabId, setActiveTabId] = useState<string>(Object.keys(tabsAnnotationData)[0]);
+    const [activeTabId, setActiveTabId] = useState<string>(lastActiveTabId || Object.keys(tabsAnnotationData)[0]);
     const [annotData, setAnnotData] = useState<{ [key: string]: any }>(tabsAnnotationData);
 
     useEffect(() => {
         document.body.style.background = isDarkMode ? "rgb(15 23 42)" : "#f1f1f1";
 
-        localStorage.setItem("isDark", String(isDarkMode)); //storing annotations in localStorage
+        localStorage.setItem("isDark", String(isDarkMode)); //storing isDark in localStorage
     }, [isDarkMode]);
 
     useEffect(() => {
         setIsLoading(true);
         setTimeout(() => { setIsLoading(false) }, 100);
+
+        localStorage.setItem("activeTabId", activeTabId); //storing activeTabId in localStorage
     }, [activeTabId]);
 
     function handleChange(annots: { [key: string]: any }) {
