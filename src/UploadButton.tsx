@@ -15,7 +15,7 @@ export default function UploadButton({
 
     return (
         <>
-            <button style={{ ...btnStyle }} onClick={() => ref.current?.click()}>{btnText}</button>
+            <div role="button" style={{ ...btnStyle }} onClick={() => ref.current?.click()}>{btnText}</div>
             <input type="file" accept={accept}
                 ref={ref}
                 style={{ display: "none" }}

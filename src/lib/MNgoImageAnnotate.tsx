@@ -165,8 +165,8 @@ export default function MNgoImageAnnotate({
         } catch (e) { console.log("failed to toggle full screen", e) }
     }
 
-    function render(compIdx: number) {
-        return (
+    return (
+        <div className="sa">
             <div
                 id={ANNOTATION_COMP_ID + compIdx}
                 className={`${isDarkMode ? "sa-bg-slate-900" : "sa-bg-white"} sa-overflow-auto sa-select-none sa-relative`}
@@ -257,10 +257,6 @@ export default function MNgoImageAnnotate({
                     </div>
                 </div>
             </div>
-        )
-    }
-
-    return (
-        <div className="sa">{render(compIdx)}</div>
+        </div>
     );
 }

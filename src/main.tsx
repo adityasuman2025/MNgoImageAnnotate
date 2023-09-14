@@ -30,7 +30,7 @@ const tabsAnnotationData = JSON.parse(localStorage.getItem("tabsAnnotData") || "
 const annotImg = localStorage.getItem("annotImg");
 const isDark = localStorage.getItem("isDark");
 
-const btnStyle = { display: "flex", alignItems: "center", justifyContent: "center", height: 23, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "0.5px solid #ccc", background: "white", minWidth: "fit-content" };
+const btnStyle = { fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", height: 23, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "0.5px solid #ccc", background: "white", minWidth: "fit-content" };
 const btnWrapperStyle = { height: 30, display: "flex", alignItems: "center", justifyContent: "center", maxWidth: "100%", overflow: "auto" };
 const COMP_IDX = 0, FRAME_ID = "frame";
 
@@ -93,16 +93,16 @@ function Main() {
                     }}
                 />
 
-                <button style={{ ...btnStyle, margin: "0 50px" }} onClick={captureSS}>Save Image</button>
+                <div role="button" style={{ ...btnStyle, margin: "0 50px" }} onClick={captureSS}>Save Image</div>
 
-                <button style={btnStyle} onClick={() => setIsDarkMode(prev => !prev)}>{isDarkMode ? "Light" : "Dark"} Mode</button>
+                <div role="button" style={btnStyle} onClick={() => setIsDarkMode(prev => !prev)}>{isDarkMode ? "Light" : "Dark"} Mode</div>
             </div>
 
             <div style={btnWrapperStyle}>
                 {
                     Object.keys(annotData).map((tabId, idx) => (
                         <div
-                            key={tabId}
+                            key={tabId} role="button"
                             style={{
                                 ...btnStyle, marginRight: 10,
                                 background: activeTabId === tabId ? "white" : "lightgrey", opacity: activeTabId === tabId ? 1 : 0.5
@@ -112,7 +112,7 @@ function Main() {
                             <span style={{ fontSize: "90%" }}> {`tab ${idx + 1}`}</span>
 
                             {
-                                idx > 0 && <div
+                                idx > 0 && <div role="button"
                                     style={{ cursor: "pointer", marginLeft: 10, borderRadius: "100%", width: 11, height: 11, background: "rgb(236, 104, 94)" }}
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -138,7 +138,7 @@ function Main() {
                     ))
                 }
 
-                <div style={btnStyle}
+                <div style={btnStyle} role="button"
                     onClick={() => {
                         const newTabId = String(new Date().getTime());
                         setAnnotData(prevAnnotData => ({ ...prevAnnotData, [newTabId]: {} }));
