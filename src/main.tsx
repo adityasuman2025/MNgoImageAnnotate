@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from 'react-dom/client';
 import { MNgoImageAnnotate } from "./lib";
+import UploadButton from "./UploadButton";
 
 import squareShape from "./squareShape.svg";
 import rectShape from "./rectShape.svg"; // ref: https://www.svgviewer.dev/s/500644/cloud
@@ -14,6 +15,8 @@ import qstnShape from "./qstnShape.svg";
 import lightImg from "./img.jpg";
 import darkImg from "./img2.jpg";
 
+const btnStyle = { display: "flex", alignItems: "center", justifyContent: "center", height: 23, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "0.5px solid #ccc", background: "white" };
+const btnWrapperStyle = { height: 30, display: "flex", alignItems: "center", justifyContent: "center" };
 
 function blobToBase64(blob: any): any {
     return new Promise((resolve, _) => {
@@ -73,41 +76,35 @@ function Main() {
 
     return (
         <>
-            <div style={{ height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <label>
-                    <span style={{ color: "grey" }}>Upload Image </span>
-                    <input type="file" name="uploadImage"
-                        accept="image/png, image/gif, image/jpeg"
-                        onChange={async (e) => {
-                            const file = e?.target?.files?.[0];
-                            if (file) {
-                                const base64Img = await blobToBase64(file);
+            <div style={btnWrapperStyle}>
+                <UploadButton
+                    btnText={"Upload Image"}
+                    accept={"image/png, image/gif, image/jpeg"}
+                    btnStyle={btnStyle}
+                    onUpload={async (files = []) => {
+                        const file = files?.[0];
+                        if (file) {
+                            const base64Img = await blobToBase64(file);
 
-                                localStorage.setItem("annotImg", base64Img); // storing image in localStorage
-                                location.reload();
-                            }
-                        }}
-                    />
-                </label>
+                            localStorage.setItem("annotImg", base64Img); // storing image in localStorage
+                            location.reload();
+                        }
+                    }}
+                />
 
-                <button onClick={captureSS}>Save Image</button>
+                <button style={{ ...btnStyle, margin: "0 50px" }} onClick={captureSS}>Save Image</button>
 
-                <div style={{ marginLeft: 100 }}>
-                    <button onClick={() => setIsDarkMode(prev => !prev)}>
-                        {isDarkMode ? "light" : "dark"} mode
-                    </button>
-                </div>
+                <button style={btnStyle} onClick={() => setIsDarkMode(prev => !prev)}>{isDarkMode ? "Light" : "Dark"} Mode</button>
             </div>
 
-            <div style={{ height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={btnWrapperStyle}>
                 {
                     Object.keys(annotData).map((tabId, idx) => (
                         <div
                             key={tabId}
                             style={{
-                                display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, height: 25, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "1px solid #ccc",
-                                background: activeTabId === tabId ? "white" : "grey",
-                                opacity: activeTabId === tabId ? 1 : 0.5
+                                ...btnStyle, marginRight: 10,
+                                background: activeTabId === tabId ? "white" : "lightgrey", opacity: activeTabId === tabId ? 1 : 0.5
                             }}
                             onClick={() => setActiveTabId(tabId)}
                         >
@@ -115,7 +112,7 @@ function Main() {
 
                             {
                                 idx > 0 && <div
-                                    style={{ cursor: "pointer", marginLeft: 10, borderRadius: "100%", width: 12, height: 12, background: "rgb(236, 104, 94)" }}
+                                    style={{ cursor: "pointer", marginLeft: 10, borderRadius: "100%", width: 11, height: 11, background: "rgb(236, 104, 94)" }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setAnnotData(prevAnnotData => {
@@ -140,10 +137,7 @@ function Main() {
                     ))
                 }
 
-                <div
-                    style={{
-                        display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, height: 25, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "1px solid #ccc", background: "white",
-                    }}
+                <div style={btnStyle}
                     onClick={() => {
                         const newTabId = String(new Date().getTime());
                         setAnnotData(prevAnnotData => ({ ...prevAnnotData, [newTabId]: {} }));
@@ -155,7 +149,7 @@ function Main() {
                 isLoading ? "loading..." :
                     <MNgoImageAnnotate
                         compIdx={COMP_IDX}
-                        compMaxHeight={(window.innerHeight - 90 + 'px') || "calc(100vh)"}
+                        compMaxHeight={(window.innerHeight - 65 + 'px') || "calc(100vh)"}
                         image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
                         // loc={[0, 857, 1620, 1825]}
                         imgWidth={annotData[activeTabId]?.imgWidth || window.innerWidth - 20}
