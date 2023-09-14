@@ -10,15 +10,19 @@ const TOOL_BAR_HEIGHT = 55, SCROLL_BAR_HEIGHT = 20;
 
 interface MNgoImageAnnotatePropsType {
     isViewMode?: boolean
-    compIdx?: number,
-    compMaxWidth?: number,
-    compMaxHeight?: string,
-    image?: string,
-    loc?: number[],
-    imgWidth?: number,
     isDarkMode?: boolean,
+
+    compIdx?: number,
+    compMaxHeight?: string,
+    compMaxWidth?: number,
+
+    image?: string,
+    imgWidth?: number,
+    loc?: number[],
+
     loader?: string | ReactElement,
     error?: string | ReactElement,
+
     textInputField?: (textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement,
     shapes?: { [key: string]: any },
     annotations?: any[],
@@ -26,15 +30,19 @@ interface MNgoImageAnnotatePropsType {
 }
 export default function MNgoImageAnnotate({
     isViewMode = false,
-    compIdx = 0,
-    compMaxWidth,
-    compMaxHeight,
-    image = "",
-    loc = [], //loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
-    imgWidth = DEFAULT_ANNOT_AREA_WIDTH,
     isDarkMode = false,
+
+    compIdx = 0,
+    compMaxHeight,
+    compMaxWidth,
+
+    image = "",
+    imgWidth = DEFAULT_ANNOT_AREA_WIDTH,
+    loc = [], //loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
+
     loader = <Loader />,
     error = "Something went wrong",
+
     textInputField = (textInputVal, setTextInputVal) => {
         return (
             <textarea

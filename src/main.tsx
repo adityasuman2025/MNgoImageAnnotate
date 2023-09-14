@@ -149,14 +149,15 @@ function Main() {
             {
                 isLoading ? "loading..." :
                     <MNgoImageAnnotate
-                        compIdx={COMP_IDX}
-                        // compMaxWidth={window.innerWidth}
-                        compMaxHeight={(window.innerHeight - 65 + 'px') || "calc(100vh)"}
-                        image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
-                        // loc={[0, 857, 1620, 1825]}
-                        imgWidth={annotData[activeTabId]?.imgWidth || window.innerWidth - 20}
-
                         isDarkMode={isDarkMode}
+
+                        compIdx={COMP_IDX}
+                        compMaxHeight={(window.innerHeight - 65 + 'px') || "calc(100vh)"}
+                        // compMaxWidth={window.innerWidth}
+
+                        image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
+                        imgWidth={annotData[activeTabId]?.imgWidth || window.innerWidth - 20}
+                        // loc={[0, 857, 1620, 1825]}
 
                         shapes={{
                             square: { btnIcon: squareShape, img: squareShape },
