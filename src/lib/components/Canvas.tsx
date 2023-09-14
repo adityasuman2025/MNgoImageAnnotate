@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
 import { AREA_ID, ANNOTATION_COMP_ID, PENCIL_TOOL } from "../constants";
 
-const LINE_WIDTH = 4;
+const LINE_WIDTH = 3;
 
 function oldCanvasDataRenderer(fig: { [key: string]: any }, canvasCtx: any, ratio: number) {
     try {
@@ -90,7 +90,7 @@ function oldCanvasDataRenderer(fig: { [key: string]: any }, canvasCtx: any, rati
         function refreshLinesAndAngles(fig: { [key: string]: any }, type: string, canvasCtx: any) {
             let canvasIndex = fig.index, fontSize = Math.round(30 / 2.2);
             if (type === 'focus') {
-                fig.nodes.forEach((eachNode: any) => {
+                fig.nodes?.forEach((eachNode: any) => {
                     canvasCtx.beginPath();
                     canvasCtx.arc(eachNode.coords[0], eachNode.coords[1], 10, 0, 2 * Math.PI);
                     canvasCtx.fillStyle = '#000000';
@@ -103,7 +103,7 @@ function oldCanvasDataRenderer(fig: { [key: string]: any }, canvasCtx: any, rati
                     canvasCtx.closePath();
                 });
             }
-            fig.lines.forEach((eachLine: any) => {
+            fig.lines?.forEach((eachLine: any) => {
                 canvasCtx.beginPath();
                 canvasCtx.moveTo(fig.nodes[eachLine.pts[0]].coords[0], fig.nodes[eachLine.pts[0]].coords[1]);
                 canvasCtx.lineTo(fig.nodes[eachLine.pts[1]].coords[0], fig.nodes[eachLine.pts[1]].coords[1]);
@@ -115,9 +115,9 @@ function oldCanvasDataRenderer(fig: { [key: string]: any }, canvasCtx: any, rati
                 canvasCtx.fillText(`${eachLine.length} cm`, fig.nodes[eachLine.pts[0]].coords[0] + ((fig.nodes[eachLine.pts[1]].coords[0] - fig.nodes[eachLine.pts[0]].coords[0]) / 2) - 20, fig.nodes[eachLine.pts[0]].coords[1] + ((fig.nodes[eachLine.pts[1]].coords[1] - fig.nodes[eachLine.pts[0]].coords[1]) / 2) - 20);
                 canvasCtx.closePath();
             });
-            fig.nodes.forEach((node: any, index: number) => {
+            fig.nodes?.forEach((node: any, index: number) => {
                 if (node.lines === 2) {
-                    fig.angles.forEach((angleData: any) => {
+                    fig.angles?.forEach((angleData: any) => {
                         if (angleData.indexPt === index) {
                             //@ts-ignore
                             const angleText = `(${angleData.angle}, ${parseFloat(Math.round((360 - angleData.angle) * 100) / 100)})`;
@@ -142,6 +142,7 @@ interface CanvasPropsType {
     height?: number,
     annot?: any[],
     setAnnot: Dispatch<SetStateAction<{ [key: string]: any }[]>>
+    scaleRatio?: number
 }
 export default function Canvas({
     compIdx = 0,
@@ -150,7 +151,8 @@ export default function Canvas({
     width = 0,
     height = 0,
     annot = [],
-    setAnnot
+    setAnnot,
+    scaleRatio = 1,
 }: CanvasPropsType) {
     const canvasRef = useRef<any>(null), ctxRef = useRef<any>(null);
     const [drawing, setDrawing] = useState<[number, number][]>([]);
@@ -167,8 +169,8 @@ export default function Canvas({
         const { scrollLeft, scrollTop }: { [key: string]: any } = document.getElementById(ANNOTATION_COMP_ID + compIdx) || {};
         const { offsetLeft: areaOffsetLeft, offsetTop: areaOffsetTop }: { [key: string]: any } = document.getElementById(AREA_ID + compIdx) || {};
 
-        const clientX = event.clientX || event.touches[0].clientX;
-        const clientY = event.clientY || event.touches[0].clientY;
+        const clientX = event?.clientX || event?.touches?.[0]?.clientX;
+        const clientY = event?.clientY || event?.touches?.[0]?.clientY;
         const offsetX = clientX + scrollLeft - areaOffsetLeft;
         const offsetY = clientY + scrollTop - areaOffsetTop;
 
@@ -193,17 +195,19 @@ export default function Canvas({
     function renderAnnotsInCanvas(annot: { [key: string]: any }[]) {
         if (!ctxRef.current || !canvasRef.current) return;
 
-        ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); //clearing old canvas data/annots
+        ctxRef.current?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); //clearing old canvas data/annots
 
         for (let i = 0; i < annot.length; i++) {
             const { type, pts } = annot[i] || {};
 
             if (type === PENCIL_TOOL) {
-                ctxRef.current.beginPath();
-                ctxRef.current.moveTo(pts[0][0], pts[0][1]);
-                for (const j in pts) {
-                    ctxRef.current.lineTo(pts[j][0], pts[j][1]);
-                    ctxRef.current.stroke();
+                ctxRef.current?.beginPath();
+                if (pts?.[0]?.[0], pts?.[0]?.[1]) {
+                    ctxRef.current?.moveTo((pts?.[0]?.[0] * scaleRatio), (pts?.[0]?.[1] * scaleRatio));
+                    for (const j in pts) {
+                        ctxRef.current?.lineTo((pts?.[j]?.[0] * scaleRatio), (pts?.[j]?.[1] * scaleRatio));
+                        ctxRef.current?.stroke();
+                    }
                 }
                 ctxRef.current.closePath();
             }
@@ -213,8 +217,8 @@ export default function Canvas({
 
     function startDraw(e: any) {
         const { offsetX, offsetY } = (e.type === "touchstart" ? getMousePosOnTouch(e) : e.nativeEvent) || {};
-        ctxRef.current.beginPath();
-        ctxRef.current.moveTo(offsetX, offsetY);
+        ctxRef.current?.beginPath();
+        ctxRef.current?.moveTo(offsetX, offsetY);
 
         setDrawing(prev => ([...prev, [offsetX, offsetY]]));
     }
@@ -222,14 +226,14 @@ export default function Canvas({
     function draw(e: any) {
         if (e.type !== "touchmove" && !(drawing.length)) return;
         const { offsetX, offsetY } = (e.type === "touchmove" ? getMousePosOnTouch(e) : e.nativeEvent) || {};
-        ctxRef.current.lineTo(offsetX, offsetY);
-        ctxRef.current.stroke();
+        ctxRef.current?.lineTo(offsetX, offsetY);
+        ctxRef.current?.stroke();
 
         setDrawing(prev => ([...prev, [offsetX, offsetY]]));
     }
 
     function stopDraw() {
-        ctxRef.current.closePath();
+        ctxRef.current?.closePath();
 
         setAnnot(prev => ([...prev, { pts: drawing, type: PENCIL_TOOL }]));
         setDrawing([]); //resetting drawing

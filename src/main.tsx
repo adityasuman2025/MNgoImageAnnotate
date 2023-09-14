@@ -15,8 +15,6 @@ import qstnShape from "./qstnShape.svg";
 import lightImg from "./img.jpg";
 import darkImg from "./img2.jpg";
 
-const btnStyle = { display: "flex", alignItems: "center", justifyContent: "center", height: 23, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "0.5px solid #ccc", background: "white" };
-const btnWrapperStyle = { height: 30, display: "flex", alignItems: "center", justifyContent: "center" };
 
 function blobToBase64(blob: any): any {
     return new Promise((resolve, _) => {
@@ -31,6 +29,9 @@ const lastActiveTabId = localStorage.getItem("activeTabId");
 const tabsAnnotationData = JSON.parse(localStorage.getItem("tabsAnnotData") || "{\"" + ts + "\":{}}");
 const annotImg = localStorage.getItem("annotImg");
 const isDark = localStorage.getItem("isDark");
+
+const btnStyle = { display: "flex", alignItems: "center", justifyContent: "center", height: 23, padding: "0px 10px", borderRadius: 5, cursor: "pointer", border: "0.5px solid #ccc", background: "white", minWidth: "fit-content" };
+const btnWrapperStyle = { height: 30, display: "flex", alignItems: "center", justifyContent: "center", maxWidth: "100%", overflow: "auto" };
 const COMP_IDX = 0, FRAME_ID = "frame";
 
 function Main() {
@@ -149,6 +150,7 @@ function Main() {
                 isLoading ? "loading..." :
                     <MNgoImageAnnotate
                         compIdx={COMP_IDX}
+                        // compMaxWidth={window.innerWidth}
                         compMaxHeight={(window.innerHeight - 65 + 'px') || "calc(100vh)"}
                         image={annotImg || (isDarkMode ? darkImg : lightImg)} //"https://tinypng.com/images/social/website.jpg"
                         // loc={[0, 857, 1620, 1825]}

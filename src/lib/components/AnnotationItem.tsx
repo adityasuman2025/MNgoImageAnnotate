@@ -1,16 +1,17 @@
-import React, { CSSProperties, Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { ResizableDiv } from ".";
 import { deleteIcon, rotateIcon } from "../images";
 import { ANNOTATION_COMP_ID, FRAME_ID, AREA_ID, TEXT_TOOL } from "../constants";
 
 const ANNOT_ACTN_BTN_STYLE = "sa-absolute sa-left-[50%] sa-rounded-full sa-w-[23px] sa-h-[23px] sa-p-[3px] sa-translate-x-[-50%] ";
 
-function myDebounce<Params extends any[]>(functionToRun: (...args: Params) => any, delay: number): (...args: Params) => void {
-    let timer: any;
-    return (...args: Params) => {
-        clearTimeout(timer)
-        timer = setTimeout(() => { functionToRun(...args) }, delay)
-    }
+function debounceUtil(func: Function, delay: number = 500) {
+    let timer: NodeJS.Timeout;
+    return (...args: any[]) => {
+        clearTimeout(timer);
+        // @ts-ignore
+        timer = setTimeout(() => { func.call(this, ...args); }, delay);
+    };
 }
 
 function getPosOfAnnot(e: any, compIdx: number) {
@@ -54,6 +55,8 @@ function getPosOfAnnot(e: any, compIdx: number) {
 interface AnnotationItemPropsType {
     compIdx?: number,
     isSelected?: boolean,
+    isViewMode?: boolean,
+    scaleRatio?: number,
     idx: number,
     annotationImg: string,
     item: { [key: string]: any },
@@ -64,6 +67,8 @@ interface AnnotationItemPropsType {
 export default function AnnotationItem({
     compIdx = 0,
     isSelected,
+    isViewMode = false,
+    scaleRatio = 1,
     idx,
     annotationImg,
     item,
@@ -71,23 +76,25 @@ export default function AnnotationItem({
     onClick,
     onDeleteClick,
 }: AnnotationItemPropsType) {
-    function handleAnnotResize(size: { [key: string]: any }, idx: number) {
-        setAnnot && setAnnot(prevAnnot => prevAnnot.map((item, i) => ({ ...item, size: ((i === idx) ? size : item.size) })));
+    function handleAnnotResize(size: { [key: string]: any }) {
+        setAnnot && setAnnot(prevAnnot => prevAnnot?.map((item, i) => ({ ...item, size: ((i === idx) ? size : item.size) })));
     }
 
-    function handleAnnotMoveStart(e: any, idx: number) {
+    function handleAnnotMoveStart(e: any) {
         const { x, y } = getPosOfAnnot(e, compIdx) || {};
 
-        const newX = x - ((item?.size?.width || 0) / 2), newY = y - ((item?.size?.height || 0) / 2);
-        if (newX >= 0 && newY >= 0) setAnnot(prev => prev.map((item, i) => ({ ...item, pos: ((i === idx) ? { x: newX, y: newY } : item.pos) })));
+        let width = item?.size?.width, height = item?.size?.height;
+        const newX = x - ((width || 0) / 2), newY = y - ((height || 0) / 2);
+        if (newX >= 0 && newY >= 0) setAnnot(prev => prev?.map((item, i) => ({ ...item, pos: ((i === idx) ? { x: newX, y: newY } : item.pos) })));
 
         setTimeout(() => e.target.classList.add("sa-opacity-0"), 0);
     }
 
-    function handleAnnotRotateStart(e: any, idx: number) {
+    function handleAnnotRotateStart(e: any) {
         const { x: newX, y: newY } = getPosOfAnnot(e, compIdx) || {};
         if (newX >= 0 && newY >= 0) {
-            const centerX = (item?.pos?.x || 0) + ((item?.size?.width || 0) / 2), centerY = (item?.pos?.y || 0) + ((item?.size?.height || 0) / 2);
+            let width = item?.size?.width, height = item?.size?.height;
+            const centerX = (item?.pos?.x || 0) + ((width || 0) / 2), centerY = (item?.pos?.y || 0) + ((height || 0) / 2);
             const rotate: number = Math.atan2(newY - centerY, newX - centerX) * (180 / Math.PI);
 
             setAnnot(prev => prev?.map((item, i) => ({ ...item, rotate: ((i === idx) ? rotate : item?.rotate) })));
@@ -100,47 +107,63 @@ export default function AnnotationItem({
         setTimeout(() => e.target.classList.remove("sa-opacity-0"), 0);
     }
 
-    const { pos = {}, size = {}, rotate = 0, type, html = "" } = item;
+    const handleAnnotMoveStartOP = debounceUtil(handleAnnotMoveStart, 80); // optimised version of handleAnnotMoveStart
+    const removeAnnotOpactiyOP = debounceUtil(removeAnnotOpactiy, 80); // optimised version of removeAnnotOpactiy
+
+    const { pos = {}, size = {}, rotate = 0, type, html = "", fontSize } = item;
+    const annotationImgStyle = {
+        fontSize: fontSize || "10pt",
+        width: (size?.width * scaleRatio), height: (size?.height * scaleRatio),
+        ...(rotate ? { transform: `rotate(${rotate}deg)` } : {}),
+        backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
+        ...(type === TEXT_TOOL ? {} : { backgroundImage: `url(${annotationImg})` }),
+    };
     return (
         <div
-            className={`!sa-absolute ${isSelected ? "sa-border-[2px] sa-border-solid sa-border-[lime]" : ""}`}
-            style={{ top: pos.y, left: pos.x }}
+            className={`!sa-absolute ${(isSelected) ? "sa-border-[2px] sa-border-solid sa-border-[lime]" : ""}`}
+            style={{ top: (pos.y * scaleRatio), left: (pos.x * scaleRatio) }}
             onClick={(e) => { e.stopPropagation(); onClick && onClick(idx) }}
         >
             <div className="sa-relative">
-                <ResizableDiv className="annotImg" onResize={(size: any) => handleAnnotResize(size, idx)}>
-                    <div
-                        className="sa-cursor-grabbing sa-text-[red] sa-text-[18pt]"
-                        style={{
-                            width: size?.width, height: size?.height,
-                            ...(rotate ? { transform: `rotate(${rotate}deg)` } : {}),
-                            backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain",
-                            ...(type === TEXT_TOOL ? {} : { backgroundImage: `url(${annotationImg})` }),
-                        } as CSSProperties}
-                        onDrag={(e) => myDebounce(handleAnnotMoveStart, 180)(e, idx)}
-                        onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 180)(e)}
-                        draggable={true}
-                        {...(type === TEXT_TOOL ? { dangerouslySetInnerHTML: { __html: html || "" } } : {})} //if type is text tool then rendering the html 
-                    />
-                </ResizableDiv>
-
                 {
-                    isSelected ?
-                        <>
+                    !isViewMode ? (
+                        <ResizableDiv className="annotImg" onResize={!isViewMode && ((size: any) => handleAnnotResize(size))}>
+                            <div
+                                className={`${!isViewMode ? "sa-cursor-grabbing" : ""} sa-text-[red]`}
+                                style={annotationImgStyle} draggable={!isViewMode}
+                                {...(type === TEXT_TOOL ? { dangerouslySetInnerHTML: { __html: html || "" } } : {})} //if type is text tool then rendering the html 
+
+                                onDrag={handleAnnotMoveStartOP}
+                                onDragEnd={removeAnnotOpactiyOP}
+                            />
+                        </ResizableDiv>
+                    ) : (
+                        <div
+                            className={`${!isViewMode ? "sa-cursor-grabbing" : ""} sa-text-[red]`}
+                            style={annotationImgStyle} draggable={!isViewMode}
+                            {...(type === TEXT_TOOL ? { dangerouslySetInnerHTML: { __html: html || "" } } : {})} //if type is text tool then rendering the html 
+                        />
+                    )
+                }
+
+                {(isSelected) && (
+                    <>
+                        {type !== TEXT_TOOL && (
                             <img
                                 className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[yellowgreen] sa-top-[-40px] sa-cursor-grab`}
                                 src={rotateIcon} alt={"rotateIcon"}
-                                onDrag={(e) => myDebounce(handleAnnotRotateStart, 180)(e, idx)}
-                                onDragEnd={(e) => myDebounce(removeAnnotOpactiy, 180)(e)}
+                                onDrag={handleAnnotRotateStart}
+                                onDragEnd={removeAnnotOpactiyOP}
                             />
-                            <img
-                                className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[red] sa-bottom-[-40px] sa-cursor-pointer sa-drag-none`}
-                                src={deleteIcon} alt={"deleteIcon"}
-                                onClick={() => { onDeleteClick && onDeleteClick(idx) }}
-                            />
-                        </>
-                        : null
-                }
+                        )}
+
+                        <img
+                            className={`${ANNOT_ACTN_BTN_STYLE} sa-bg-[red] sa-bottom-[-40px] sa-cursor-pointer sa-drag-none`}
+                            src={deleteIcon} alt={"deleteIcon"}
+                            onClick={() => { onDeleteClick && onDeleteClick(idx) }}
+                        />
+                    </>
+                )}
             </div>
         </div>
     )
