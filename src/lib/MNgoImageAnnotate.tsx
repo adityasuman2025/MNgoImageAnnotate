@@ -20,8 +20,8 @@ interface MNgoImageAnnotatePropsType {
     imgWidth?: number,
     loc?: number[],
 
-    loader?: string | ReactElement,
-    error?: string | ReactElement,
+    loadingRenderer?: string | ReactElement,
+    errorRenderer?: string | ReactElement,
 
     textInputField?: (textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement,
     shapes?: { [key: string]: any },
@@ -40,8 +40,8 @@ export default function MNgoImageAnnotate({
     imgWidth = DEFAULT_ANNOT_AREA_WIDTH,
     loc = [], //loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
 
-    loader = <Loader />,
-    error = "Something went wrong",
+    loadingRenderer = <Loader />,
+    errorRenderer = "Something went wrong",
 
     textInputField = (textInputVal, setTextInputVal) => {
         return (
@@ -204,7 +204,7 @@ export default function MNgoImageAnnotate({
                 {
                     height <= 10 &&
                     <div className={`sa-absolute sa-top-[${TOOL_BAR_HEIGHT}] sa-left-0 sa-right-0`}>
-                        {height === -400 ? error : loader}
+                        {height === -400 ? errorRenderer : loadingRenderer}
                     </div>
                 }
 

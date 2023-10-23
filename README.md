@@ -33,8 +33,8 @@ One can easily annotate over image in react.js by installing `react-image-annota
         imgWidth={number}
         loc={number[]}
         
-        loader={string | ReactElement}
-        error={string | ReactElement}
+        loadingRenderer={string | ReactElement}
+        errorRenderer={string | ReactElement}
 
         textInputField={(textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement}
         shapes={{ [key: string]: any }}
@@ -55,8 +55,8 @@ One can easily annotate over image in react.js by installing `react-image-annota
 7.  `imgWidth` width of the image, default value is 900
 8.  `loc` loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
 
-9.  `loader` ReactElement or string to display while image is loading/downloading, default value is "loading"
-10.  `error` ReactElement or string to display when image could not be loaded, default value is "something went wrong"
+9.  `loadingRenderer` ReactElement or string to display while image is loading/downloading, default value is "loading"
+10.  `errorRenderer` ReactElement or string to display when image could not be loaded, default value is "something went wrong"
 
 11.  `textInputField` a function to render Text Tool Input Field,
     e.g.
