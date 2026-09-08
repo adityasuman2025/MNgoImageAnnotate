@@ -4,7 +4,7 @@ This library is available at [react-image-annotate-mngo](https://www.npmjs.com/p
 
 ## Demo
 
-[annotate.mngo.in](https://annotate.mngo.in)
+[annotate.adityas.site](https://annotate.adityas.site)
 
 ## Brief:
 
