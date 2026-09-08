@@ -70,10 +70,6 @@ export default function RootLayout({
                 />
             </head>
             <body>
-                <Script
-                    src="https://html2canvas.hertzen.com/dist/html2canvas.js"
-                    strategy="beforeInteractive"
-                />
                 <div id="root">{children}</div>
             </body>
         </html>
