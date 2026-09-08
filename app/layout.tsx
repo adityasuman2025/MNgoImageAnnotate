@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import fs from 'fs';
 import path from 'path';
-import Script from 'next/script';
 
 // Inline compiled CSS statically during SSG build to eliminate render-blocking requests
 const getCssContent = () => {

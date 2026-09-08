@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "start": "npm run lib-build && next dev",
+        "dev": "npm run lib-build && next dev",
         "build": "npm run lib-build && next build",
         "build-start": "npm run build && next start",
         "lib-build": "cd library && npm install --include=dev && npm run lib-build",
