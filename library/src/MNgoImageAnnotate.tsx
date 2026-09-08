@@ -8,26 +8,8 @@ import "./index.css";
 
 const TOOL_BAR_HEIGHT = 55, SCROLL_BAR_HEIGHT = 20;
 
-interface MNgoImageAnnotatePropsType {
-    isViewMode?: boolean
-    isDarkMode?: boolean,
+import { MNgoImageAnnotatePropsType } from "./types";
 
-    compIdx?: number,
-    compMaxHeight?: string,
-    compMaxWidth?: number,
-
-    image?: string,
-    imgWidth?: number,
-    loc?: number[],
-
-    loadingRenderer?: string | ReactElement,
-    errorRenderer?: string | ReactElement,
-
-    textInputField?: (textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement,
-    shapes?: { [key: string]: any },
-    annotations?: any[],
-    onChange?: (data: { [key: string]: any }) => void
-}
 export default function MNgoImageAnnotate({
     isViewMode = false,
     isDarkMode = false,

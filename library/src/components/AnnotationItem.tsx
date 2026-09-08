@@ -6,7 +6,7 @@ import { ANNOTATION_COMP_ID, FRAME_ID, AREA_ID, TEXT_TOOL } from "../constants";
 const ANNOT_ACTN_BTN_STYLE = "sa-absolute sa-left-[50%] sa-rounded-full sa-w-[23px] sa-h-[23px] sa-p-[3px] sa-translate-x-[-50%] ";
 
 function debounceUtil(func: Function, delay: number = 500) {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     return (...args: any[]) => {
         clearTimeout(timer);
         // @ts-ignore
