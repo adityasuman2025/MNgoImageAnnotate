@@ -23,6 +23,7 @@
         "url": "git@github.com:adityasuman2025/MNgoImageAnnotate.git"
     },
     "scripts": {
+        "dev": "vite",
         "lib-build": "vite build && tsc",
         "prepublishOnly": "npm run lib-build"
     },
