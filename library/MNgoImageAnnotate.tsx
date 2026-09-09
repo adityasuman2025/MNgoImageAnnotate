@@ -1,16 +1,10 @@
 import { memo } from "react";
 
-interface MNgoImageAnnotateProps {
-
-}
-function MNgoImageAnnotate({
-
-}: MNgoImageAnnotateProps) {
+function MNgoImageAnnotate() {
     return (
-        <div>
+        <div className="bg-red-100 min-h-dvh">
             MNgoImageAnnotate
         </div>
     )
 }
-
 export default memo(MNgoImageAnnotate);

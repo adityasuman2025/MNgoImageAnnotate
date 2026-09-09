@@ -8,7 +8,7 @@ This library is available on npm at [react-image-annotate-mngo](https://www.npmj
 
 ## Demo
 
-- Live Demo: [annotate.mngo.in](https://annotate.mngo.in)
+- Live Demo: [annotate.adityas.site](https://annotate.adityas.site)
 
 ---
 

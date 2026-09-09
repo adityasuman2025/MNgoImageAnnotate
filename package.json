@@ -1,24 +1,27 @@
 {
-    "name": "portfolio-website",
-    "private": true,
-    "version": "1.0.0",
-    "type": "module",
-    "scripts": {
-        "dev": "npm run lib-build && next dev",
-        "build": "npm run lib-build && next build",
-        "build-start": "npm run build && next start",
-        "lib-build": "cd library && npm install --include=dev && npm run lib-build",
-        "lib-publish": "cd library && npm publish"
-    },
-    "dependencies": {
-        "next": "^16.2.10",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0"
-    },
-    "devDependencies": {
-        "@types/node": "^20.9.2",
-        "@types/react": "^18.2.37",
-        "@types/react-dom": "^18.2.15",
-        "typescript": "^5.2.2"
-    }
+  "name": "react-image-annotate-mngo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2"
+  }
 }
