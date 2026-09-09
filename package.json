@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
+        "dev": "npm run lib-build && vite",
         "build": "npm run lib-build && tsc -b && vite build",
         "lib-build": "vite build --config vite.config.lib.ts",
         "prepublishOnly": "npm run lib-build"

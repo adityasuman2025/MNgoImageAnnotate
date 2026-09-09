@@ -1,8 +1,7 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-
 // @ts-ignore
 import MNgoImageAnnotate from "../dist/index.es.js";
+import "./index.css";
 
 function App() {
   return (
@@ -10,8 +9,4 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+createRoot(document.getElementById('root')!).render(<App />);
