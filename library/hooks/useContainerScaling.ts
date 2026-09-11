@@ -18,11 +18,18 @@ export default function useContainerScaling({
 
     const updateBaseDimensions = useCallback((el: HTMLElement | null) => {
         if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const width = el.clientWidth || rect.width;
-        const height = el.clientHeight || rect.height;
 
-        if (width > 0 && height > 0) setBgBaseDimn((prev) => prev ?? { width, height });
+        let width = 0, height = 0;
+        if (el instanceof HTMLImageElement) {
+            width = el.naturalWidth;
+            height = el.naturalHeight;
+        } else {
+            const rect = el.getBoundingClientRect();
+            width = el.clientWidth || rect.width;
+            height = el.clientHeight || rect.height;
+        }
+
+        if (width > 0 && height > 0) setBgBaseDimn(prev => prev ?? { width, height });
     }, []);
 
     useEffect(() => {
