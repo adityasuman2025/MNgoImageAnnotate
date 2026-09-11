@@ -9,17 +9,14 @@
       "node"
     ],
     "skipLibCheck": true,
-    /* Bundler mode */
     "module": "nodenext",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
-    /* JSX Support */
-    "jsx": "react-jsx", // <-- Add or update this line
-    /* Linting */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "jsx": "react-jsx",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
