@@ -1,6 +1,6 @@
 import { memo, useCallback, type RefObject } from "react";
-import { getTransformStyle, type Coordinates } from "../utils/transform";
-import { useScaleFactor } from "../context/ScaleFactorContext";
+import { getTransformStyle } from "../utils/transform";
+import type { Coordinates } from "../types";
 import rotateIcon from "../images/rotateIcon.svg";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";
@@ -19,7 +19,6 @@ function RotateButton({
     setRotation,
     className = "",
 }: RotateButtonProps) {
-    const { scaleFactorRef } = useScaleFactor();
     const cleanupRotateRef = useUnmountCleanup();
 
     const handleRotatePointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
@@ -28,8 +27,7 @@ function RotateButton({
 
         const element = elementRef.current;
         const currPos = posRef.current;
-        const currScaleFactor = scaleFactorRef.current;
-        if (!element || !currPos || !currScaleFactor) return;
+        if (!element || !currPos) return;
 
         const rect = element.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;

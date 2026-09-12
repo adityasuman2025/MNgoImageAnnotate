@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, type RefObject } from "react";
-import type { Dimensions, ScaleFactors } from "../utils/transform";
+import type { Dimensions, ScaleFactors } from "../types";
 
 interface UseContainerScalingOptions {
     bgRef: RefObject<HTMLElement | null>;
@@ -58,7 +58,8 @@ export default function useContainerScaling({
                     if (rootEl) {
                         rootEl.style.setProperty('--scale-x', `${scaleFactorRef.current?.x}`);
                         rootEl.style.setProperty('--scale-y', `${scaleFactorRef.current?.y}`);
-                        const toolbarHeight = rootEl.firstElementChild?.clientHeight || 0;
+                        const toolbarHeight = (rootEl.firstElementChild?.clientHeight || 0) + 2;
+
                         rootEl.style.maxHeight = `${bgBaseDimn.height * scaleFactorRef.current?.y + toolbarHeight}px`;
                     }
                 })

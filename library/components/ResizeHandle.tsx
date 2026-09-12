@@ -1,6 +1,6 @@
 import { memo, useCallback, type RefObject } from "react";
 import { useScaleFactor } from "../context/ScaleFactorContext";
-import type { Dimensions } from "../utils/transform";
+import type { Dimensions } from "../types";
 import { MIN_ELEMENT_DIMENSIONS } from "../constants";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";

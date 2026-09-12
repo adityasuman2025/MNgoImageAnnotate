@@ -1,11 +1,13 @@
 import { memo, useState, useRef, useCallback } from "react";
-import { getTransformStyle, type Coordinates, type Dimensions } from "../utils/transform";
+import { getTransformStyle } from "../utils/transform";
+import type { Coordinates, Dimensions } from "../types";
 import { useScaleFactor } from "../context/ScaleFactorContext";
 import SelectionOverlay from "./SelectionOverlay";
 import { DEFAULT_ELEMENT_POS, DEFAULT_ELEMENT_ROTATION, DEFAULT_ELEMENT_DIMENSIONS } from "../constants";
 import useSyncedRef from "../hooks/useSyncedRef";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";
+import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 
 export interface ElementProps {
     id: string;
@@ -17,6 +19,8 @@ function Element({
     isSelected,
     onSelect,
 }: ElementProps) {
+    const { readonly } = useGlobalStaticData();
+
     // Element encapsulates its own state (will come from global store by ID in future)
     const [pos, setPos] = useState<Coordinates>(() => ({ ...DEFAULT_ELEMENT_POS })); // will come from global store
     const posRef = useSyncedRef<Coordinates>(pos);
@@ -33,6 +37,8 @@ function Element({
     const cleanupDragRef = useUnmountCleanup(); // cleaning up the pointer window events and raf on un-mount
 
     const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (readonly) return;
+
         cleanupDragRef.current?.();
 
         const element = elementRef.current;
@@ -40,8 +46,7 @@ function Element({
         const currScaleFactor = scaleFactorRef.current;
         if (!element || !currPos || !currScaleFactor) return;
 
-        // making that element in selected state
-        onSelect(id);
+        onSelect(id); // making that element in selected state
 
         const dragStartPosX = e.clientX, dragStartPosY = e.clientY;
         const currPosX = currPos.x, currPosY = currPos.y;
@@ -78,13 +83,14 @@ function Element({
 
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
-    }, [id, onSelect]);
+    }, [id, onSelect, readonly]);
 
     return (
         <div
             ref={elementRef}
             data-annotation-element
-            className="cursor-grab select-none absolute bg-teal-100 p-2 overflow-visible flex items-center justify-center text-sm font-medium"
+            className={`select-none absolute bg-teal-100 p-2 overflow-visible flex items-center justify-center text-sm font-medium ${readonly ? "pointer-events-none cursor-default" : "cursor-grab"
+                }`}
             onPointerDown={handlePointerDown}
             style={{
                 top: 0,

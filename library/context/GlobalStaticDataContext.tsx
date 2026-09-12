@@ -1,11 +1,11 @@
 import { useContext, createContext, type ReactNode, type RefObject } from "react";
-import type { MNgoImageAnnotateProps } from "../MNgoImageAnnotate";
-import type { Dimensions } from "../utils/transform";
+import type { MNgoImageAnnotateProps, Dimensions } from "../types";
 
 interface StaticDataType extends MNgoImageAnnotateProps {
     toScale: boolean;
     bgRef?: RefObject<HTMLElement | null>;
     bgBaseDimn?: Dimensions | null;
+    compRootRef?: RefObject<HTMLDivElement | null>;
 }
 const GlobalStaticDataContext = createContext<StaticDataType | null>(null);
 

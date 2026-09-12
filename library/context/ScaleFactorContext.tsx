@@ -1,6 +1,5 @@
 import { useContext, createContext, useMemo, type ReactNode, type RefObject } from "react";
-import type { MNgoImageAnnotateProps } from "../MNgoImageAnnotate";
-import type { ScaleFactors } from "../utils/transform";
+import type { MNgoImageAnnotateProps, ScaleFactors } from "../types";
 
 interface ScaleFactorType extends MNgoImageAnnotateProps {
     scaleFactorRef: RefObject<ScaleFactors>;

@@ -1,5 +1,5 @@
 import { memo, type RefObject } from "react";
-import type { Coordinates, Dimensions } from "../utils/transform";
+import type { Coordinates, Dimensions } from "../types";
 import RotateButton from "./RotateButton";
 import ResizeHandle from "./ResizeHandle";
 import deleteIcon from "../images/deleteIcon.svg";
