@@ -11,7 +11,7 @@ export default function useContainerScaling({
     compRootRef,
     imgSrc,
 }: UseContainerScalingOptions) {
-    const toScale = !!imgSrc;
+    const toScale = !!imgSrc; // we are not doing scaling when the backgound is not an image
 
     const [bgBaseDimn, setBgBaseDimn] = useState<Dimensions | null>(null);
     const scaleFactorRef = useRef<ScaleFactors>({ x: 1, y: 1 });
@@ -33,23 +33,13 @@ export default function useContainerScaling({
     }, []);
 
     useEffect(() => {
-        const el = bgRef.current;
-        if (!el) return;
-
-        if (el instanceof HTMLImageElement && !el.complete) {
-            const handleLoad = () => updateBaseDimensions(el);
-
-            el.addEventListener("load", handleLoad, { once: true });
-            return () => el.removeEventListener("load", handleLoad);
-        } else updateBaseDimensions(el);
-    }, [imgSrc, bgRef, updateBaseDimensions]);
-
-    useEffect(() => {
+        // to handle scale factor when window is resized
         if (!toScale) return;
 
         const containerElement = bgRef?.current;
         if (!containerElement || !bgBaseDimn) return;
 
+        let rafId: number | null = null;
         function updateScale() {
             if (!containerElement || !bgBaseDimn) return;
             const rect = containerElement.getBoundingClientRect();
@@ -58,24 +48,35 @@ export default function useContainerScaling({
 
             if (currentWidth === 0 || currentHeight === 0) return;
 
-            const newScaleFactor: ScaleFactors = { x: currentWidth / bgBaseDimn.width, y: currentHeight / bgBaseDimn.height };
-            scaleFactorRef.current = newScaleFactor;
+            scaleFactorRef.current = { x: currentWidth / bgBaseDimn.width, y: currentHeight / bgBaseDimn.height };
 
             // storing the scale factor as var in style tags so that it can be directly applied in css for transform
-            const rootEl = compRootRef.current;
-            if (rootEl) {
-                rootEl.style.setProperty('--scale-x', `${newScaleFactor.x}`);
-                rootEl.style.setProperty('--scale-y', `${newScaleFactor.y}`);
-                const toolbarHeight = rootEl.firstElementChild?.clientHeight || 0;
-                rootEl.style.maxHeight = `${bgBaseDimn.height * newScaleFactor.y + toolbarHeight}px`;
+            if (rafId === null) {
+                rafId = requestAnimationFrame(() => {
+                    rafId = null;
+                    const rootEl = compRootRef.current;
+                    if (rootEl) {
+                        rootEl.style.setProperty('--scale-x', `${scaleFactorRef.current?.x}`);
+                        rootEl.style.setProperty('--scale-y', `${scaleFactorRef.current?.y}`);
+                        const toolbarHeight = rootEl.firstElementChild?.clientHeight || 0;
+                        rootEl.style.maxHeight = `${bgBaseDimn.height * scaleFactorRef.current?.y + toolbarHeight}px`;
+                    }
+                })
             }
         }
 
         updateScale();
         const resizeObserver = new ResizeObserver(updateScale);
         resizeObserver.observe(containerElement);
-        return () => resizeObserver.disconnect();
-    }, [bgRef, compRootRef, bgBaseDimn, toScale]);
+        return () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            resizeObserver.disconnect();
+        }
+    }, [bgBaseDimn, toScale]);
+
 
     return { toScale, bgBaseDimn, scaleFactorRef, updateBaseDimensions };
 }

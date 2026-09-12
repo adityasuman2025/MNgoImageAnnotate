@@ -15,28 +15,27 @@ export interface Dimensions {
 
 export interface TransformStyleOptions {
     pos: Coordinates;
-    scale?: ScaleFactors;
-    delta?: { x?: number; y?: number };
-    applyScaleTransform?: boolean;
-    useCssVariables?: boolean;
+    delta?: Coordinates;
+    rotation?: number;
 }
+
 export function getTransformStyle({
     pos,
-    scale = { x: 1, y: 1 },
-    delta = {},
-    applyScaleTransform = false,
-    useCssVariables = false,
+    delta = { x: 0, y: 0 },
+    rotation = 0,
 }: TransformStyleOptions): string {
     const dx = delta.x ?? 0;
     const dy = delta.y ?? 0;
 
-    if (useCssVariables) {
-        const xExpr = dx !== 0 ? `calc(${pos.x}px * var(--scale-x, 1) + ${dx}px)` : `calc(${pos.x}px * var(--scale-x, 1))`;
-        const yExpr = dy !== 0 ? `calc(${pos.y}px * var(--scale-y, 1) + ${dy}px)` : `calc(${pos.y}px * var(--scale-y, 1))`;
-        const translate = `translate3d(${xExpr}, ${yExpr}, 0)`;
-        return applyScaleTransform ? `${translate} scale(var(--scale-x, 1), var(--scale-y, 1))` : translate;
-    }
+    const xExpr = dx !== 0 ? `calc(${pos.x}px * var(--scale-x, 1) + ${dx}px)` : `calc(${pos.x}px * var(--scale-x, 1))`;
+    const yExpr = dy !== 0 ? `calc(${pos.y}px * var(--scale-y, 1) + ${dy}px)` : `calc(${pos.y}px * var(--scale-y, 1))`;
+    const translate = `translate3d(${xExpr}, ${yExpr}, 0)`;
 
-    const translate = `translate3d(${pos.x * scale.x + dx}px, ${pos.y * scale.y + dy}px, 0)`;
-    return applyScaleTransform ? `${translate} scale(${scale.x}, ${scale.y})` : translate;
+    // Shifts the pivot point to the center of the element (50%, 50%), rotates it,
+    // and shifts it back (-50%, -50%) so rotation occurs around the middle while
+    // preserving "transform-origin: top left" for position and scaling.
+    const rotateTransform = rotation !== 0 ? `translate(50%, 50%) rotate(${rotation}deg) translate(-50%, -50%)` : "";
+
+    return [translate, rotateTransform].filter(Boolean).join(" ");
 }
+
