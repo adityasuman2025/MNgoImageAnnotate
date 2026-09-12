@@ -1,25 +1,25 @@
 import { memo, useCallback, type RefObject } from "react";
 import { useScaleFactor } from "../context/ScaleFactorContext";
-import type { Dimensions } from "../types";
+import type { AnnotationId, Dimensions } from "../types";
 import { MIN_ELEMENT_DIMENSIONS } from "../constants";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";
+import updateAnnotationById from "../utils/updateAnnotationById";
 
 interface ResizeHandleProps {
+    id: AnnotationId;
     elementRef: RefObject<HTMLDivElement | null>;
-    dimensionsRef: RefObject<Dimensions>;
     rotationRef: RefObject<number>;
-    setDimensions: (dimensions: Dimensions) => void;
+    dimensionsRef: RefObject<Dimensions>;
     minWidth?: number;
     minHeight?: number;
     className?: string;
 }
-
 function ResizeHandle({
+    id,
     elementRef,
-    dimensionsRef,
     rotationRef,
-    setDimensions,
+    dimensionsRef,
     minWidth = MIN_ELEMENT_DIMENSIONS.width,
     minHeight = MIN_ELEMENT_DIMENSIONS.height,
     className = "absolute -bottom-2.5 -right-2.5 w-3.5 h-3.5 bg-white border-2 border-teal-600 rounded-full cursor-nwse-resize shadow-sm hover:scale-125 transition-transform pointer-events-auto",
@@ -74,7 +74,9 @@ function ResizeHandle({
 
         function onPointerUp() {
             cleanup();
-            setDimensions({ width: finalWidth, height: finalHeight });
+            if (finalWidth !== initialWidth || finalHeight !== initialHeight) {
+                updateAnnotationById(id, (prev) => ({ ...prev, dimensions: { width: finalWidth, height: finalHeight } }));
+            }
         }
 
         const cleanup = createGestureCleanup({
@@ -87,7 +89,7 @@ function ResizeHandle({
 
         window.addEventListener("pointermove", onPointerMove);
         window.addEventListener("pointerup", onPointerUp);
-    }, [minHeight, minWidth, setDimensions]);
+    }, [id, minHeight, minWidth]);
 
     return (
         <div

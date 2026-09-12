@@ -1,11 +1,12 @@
-import { memo, useRef, useMemo, type ReactNode } from "react";
+import { memo, useRef, useMemo } from "react";
 import GlobalStaticDataContextWrapper from "./context/GlobalStaticDataContext";
 import ScaleFactorProvider from "./context/ScaleFactorContext";
 import useContainerScaling from "./hooks/useContainerScaling";
 import Image from "./components/Image";
 import Ground from "./components/Ground";
 import Toolbar from "./components/Toolbar";
-import type { MNgoImageAnnotateProps } from "./types";
+import type { MNgoImageAnnotateProps, Tool } from "./types";
+import { DEFAULT_TOOLS } from "./constants";
 import './index.css';
 
 function MNgoImageAnnotate({
@@ -19,6 +20,8 @@ function MNgoImageAnnotate({
 
     const { toScale, bgBaseDimn, scaleFactorRef, updateBaseDimensions } = useContainerScaling({ bgRef, compRootRef, imgSrc });
 
+    const allTools: Tool[] = useMemo(() => ([...(tools || []), ...DEFAULT_TOOLS]), [tools]);
+
     const staticData = useMemo(() => ({
         readonly,
         imgSrc,
@@ -27,17 +30,18 @@ function MNgoImageAnnotate({
         bgBaseDimn,
         compRootRef,
         tools,
+        allTools,
         title,
-    }), [readonly, imgSrc, toScale, bgBaseDimn, tools, title]);
+    }), [readonly, imgSrc, toScale, bgBaseDimn, tools, allTools, title]);
 
     return (
         <GlobalStaticDataContextWrapper data={staticData}>
             <ScaleFactorProvider scaleFactorRef={scaleFactorRef}>
                 <div
                     ref={compRootRef}
-                    className="flex flex-col justify-between w-full h-full flex-1 overflow-y-auto min-h-96"
+                    className="flex flex-col justify-between w-full h-full flex-1 min-h-96 overflow-hidden"
                 >
-                    <Toolbar title={title} tools={tools} />
+                    <Toolbar />
 
                     <div className="relative flex-1 flex">
                         {imgSrc ? (

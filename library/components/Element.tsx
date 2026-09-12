@@ -1,12 +1,12 @@
-import { memo, useState, useRef, useCallback } from "react";
-import { getTransformStyle } from "../utils/transform";
-import type { Coordinates, Dimensions } from "../types";
+import { memo, useRef, useCallback } from "react";
+import { ELEMENT_TRANSFORM_TEMPLATE, getElementTransformVariables } from "../utils/transform";
 import { useScaleFactor } from "../context/ScaleFactorContext";
 import SelectionOverlay from "./SelectionOverlay";
-import { DEFAULT_ELEMENT_POS, DEFAULT_ELEMENT_ROTATION, DEFAULT_ELEMENT_DIMENSIONS } from "../constants";
-import useSyncedRef from "../hooks/useSyncedRef";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
+import useAnnotation from "../hooks/useAnnotation";
+import useToolIcon from "../hooks/useToolIcon";
 import { createGestureCleanup } from "../utils/gesture";
+import updateAnnotationById from "../utils/updateAnnotationById";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 
 export interface ElementProps {
@@ -19,25 +19,20 @@ function Element({
     isSelected,
     onSelect,
 }: ElementProps) {
-    const { readonly } = useGlobalStaticData();
-
-    // Element encapsulates its own state (will come from global store by ID in future)
-    const [pos, setPos] = useState<Coordinates>(() => ({ ...DEFAULT_ELEMENT_POS })); // will come from global store
-    const posRef = useSyncedRef<Coordinates>(pos);
-
-    const [rotation, setRotation] = useState<number>(DEFAULT_ELEMENT_ROTATION); // will come from global store
-    const rotationRef = useSyncedRef<number>(rotation);
-
-    const [dimensions, setDimensions] = useState<Dimensions>(() => ({ ...DEFAULT_ELEMENT_DIMENSIONS })); // will come from global store
-    const dimensionsRef = useSyncedRef<Dimensions>(dimensions);
-    // Element encapsulates its own state (will come from global store by ID in future)
-
     const elementRef = useRef<HTMLDivElement>(null);
+
+    const { readonly } = useGlobalStaticData();
     const { scaleFactorRef } = useScaleFactor();
     const cleanupDragRef = useUnmountCleanup(); // cleaning up the pointer window events and raf on un-mount
 
+    const { name, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef } = useAnnotation(id);
+    const toolIcon = useToolIcon(name);
+
+    console.log("Element render")
+
     const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (readonly) return;
+        e.stopPropagation();
 
         cleanupDragRef.current?.();
 
@@ -51,18 +46,21 @@ function Element({
         const dragStartPosX = e.clientX, dragStartPosY = e.clientY;
         const currPosX = currPos.x, currPosY = currPos.y;
 
-        let diffX = 0, diffY = 0;
+        let newX = currPosX, newY = currPosY;
         let rafId: number | null = null;
 
         function onPointerMove(moveEvent: PointerEvent) {
-            diffX = moveEvent.clientX - dragStartPosX;
-            diffY = moveEvent.clientY - dragStartPosY;
+            const diffX = moveEvent.clientX - dragStartPosX, diffY = moveEvent.clientY - dragStartPosY;
+
+            newX = currPosX + diffX / currScaleFactor.x;
+            newY = currPosY + diffY / currScaleFactor.y;
 
             if (rafId === null) {
                 rafId = requestAnimationFrame(() => {
                     rafId = null;
                     if (element) {
-                        element.style.transform = getTransformStyle({ pos: currPos, delta: { x: diffX, y: diffY }, rotation: rotationRef.current });
+                        element.style.setProperty("--el-x", `${newX}px`);
+                        element.style.setProperty("--el-y", `${newY}px`);
                     }
                 });
             }
@@ -70,7 +68,9 @@ function Element({
 
         function onPointerUp() {
             cleanup();
-            setPos({ x: currPosX + diffX / currScaleFactor.x, y: currPosY + diffY / currScaleFactor.y });
+            if (newX !== currPosX || newY !== currPosY) {
+                updateAnnotationById(id, prev => ({ ...prev, pos: { x: newX, y: newY } }));
+            }
         }
 
         const cleanup = createGestureCleanup({
@@ -89,8 +89,7 @@ function Element({
         <div
             ref={elementRef}
             data-annotation-element
-            className={`select-none absolute bg-teal-100 p-2 overflow-visible flex items-center justify-center text-sm font-medium ${readonly ? "pointer-events-none cursor-default" : "cursor-grab"
-                }`}
+            className={`select-none absolute overflow-visible flex items-center justify-center text-sm font-medium ${readonly ? "pointer-events-none cursor-default" : "cursor-grab"}`}
             onPointerDown={handlePointerDown}
             style={{
                 top: 0,
@@ -99,19 +98,18 @@ function Element({
                 height: `calc(${dimensions.height}px * var(--scale-y, 1))`,
                 transformOrigin: "top left",
                 willChange: "transform, width, height",
-                transform: getTransformStyle({ pos, rotation }),
+                transform: ELEMENT_TRANSFORM_TEMPLATE,
+                ...getElementTransformVariables(pos, rotation),
             }}
         >
-            Element
+            {toolIcon}
 
             {isSelected && (
                 <SelectionOverlay
+                    id={id}
                     elementRef={elementRef}
-                    posRef={posRef}
-                    dimensionsRef={dimensionsRef}
                     rotationRef={rotationRef}
-                    setDimensions={setDimensions}
-                    setRotation={setRotation}
+                    dimensionsRef={dimensionsRef}
                 />
             )}
         </div>

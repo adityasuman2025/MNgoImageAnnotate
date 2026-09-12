@@ -1,22 +1,20 @@
 import { memo, useCallback, type RefObject } from "react";
-import { getTransformStyle } from "../utils/transform";
-import type { Coordinates } from "../types";
+import type { AnnotationId } from "../types";
 import rotateIcon from "../images/rotateIcon.svg";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";
+import updateAnnotationById from "../utils/updateAnnotationById";
 
 interface RotateButtonProps {
+    id: AnnotationId;
     elementRef: RefObject<HTMLDivElement | null>;
-    posRef: RefObject<Coordinates>;
     rotationRef: RefObject<number>;
-    setRotation: (rotation: number) => void;
     className?: string;
 }
 function RotateButton({
+    id,
     elementRef,
-    posRef,
     rotationRef,
-    setRotation,
     className = "",
 }: RotateButtonProps) {
     const cleanupRotateRef = useUnmountCleanup();
@@ -26,8 +24,7 @@ function RotateButton({
         e.stopPropagation();
 
         const element = elementRef.current;
-        const currPos = posRef.current;
-        if (!element || !currPos) return;
+        if (!element) return;
 
         const rect = element.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -46,16 +43,16 @@ function RotateButton({
             if (rafId === null) {
                 rafId = requestAnimationFrame(() => {
                     rafId = null;
-                    if (element) {
-                        element.style.transform = getTransformStyle({ pos: currPos, rotation: currentRot });
-                    }
+                    if (element) element.style.setProperty("--el-rot", `${currentRot}deg`);
                 });
             }
         }
 
         function onPointerUp() {
             cleanup();
-            setRotation(currentRot);
+            if (currentRot !== initialRotation) {
+                updateAnnotationById(id, (prev) => ({ ...prev, rotation: currentRot }));
+            }
         }
 
         const cleanup = createGestureCleanup({
@@ -68,7 +65,7 @@ function RotateButton({
 
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
-    }, [setRotation]);
+    }, [id]);
 
     return (
         <button

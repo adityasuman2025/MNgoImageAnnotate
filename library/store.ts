@@ -26,8 +26,11 @@ const globalStore = {
     getActiveToolName(): ActiveToolName {
         return state.activeToolName;
     },
-    setActiveToolName(toolName: ActiveToolName) {
-        state.activeToolName = toolName;
+    setActiveToolName(arg: ActiveToolName | ((prev: ActiveToolName) => ActiveToolName)) {
+        const next = typeof arg === "function" ? arg(state.activeToolName) : arg;
+        if (next === state.activeToolName) return;
+
+        state.activeToolName = next
 
         activeToolNameSubscribers.forEach(cb => cb());
     },
@@ -40,7 +43,7 @@ const globalStore = {
 
     // for getting list of all annotations (will be used in Ground comp)
     getAllAnnotationIds(): AnnotationId[] {
-        return state?.annotationData?.annotationIds || []
+        return state?.annotationData?.annotationIds;
     },
     setAnnotationData: function (annotationData: AnnotationData) {
         state.annotationData = annotationData;
@@ -71,10 +74,13 @@ const globalStore = {
     updateAnnotationById(id: AnnotationId, data: Annotation) {
         const isNew = !Object.hasOwn(state.annotationData.annotations, id);
 
-        state.annotationData.annotations[id] = data;
+        state.annotationData.annotations = {
+            ...state.annotationData.annotations,
+            [id]: data,
+        };
 
         if (isNew) {
-            state.annotationData.annotationIds.push(id);
+            state.annotationData.annotationIds = [...state.annotationData.annotationIds, id];
             annotationDataSubscribers.forEach(cb => cb());
         }
 
@@ -86,7 +92,9 @@ const globalStore = {
     removeAnnotationById(id: AnnotationId) {
         if (!Object.hasOwn(state.annotationData.annotations, id)) return;
 
-        delete state.annotationData.annotations[id];
+        const { [id]: _, ...rest } = state.annotationData.annotations;
+        state.annotationData.annotations = rest;
+
         state.annotationData.annotationIds = state.annotationData.annotationIds.filter(currId => currId !== id);
 
         annotationByIdSubscribers.delete(id);
@@ -97,11 +105,11 @@ const globalStore = {
     subscribeToAnnotationById(id: AnnotationId, cb: Callback) {
         if (!annotationByIdSubscribers.has(id)) annotationByIdSubscribers.set(id, new Set());
 
-        const thisIdSet = annotationByIdSubscribers.get(id);
-        thisIdSet.add(cb);
+        const thisIdSet = annotationByIdSubscribers.get(id)!;
+        thisIdSet?.add(cb);
 
         return () => {
-            thisIdSet.delete(cb);
+            thisIdSet?.delete(cb);
 
             if (thisIdSet.size === 0) annotationByIdSubscribers.delete(id);
         };

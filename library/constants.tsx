@@ -31,11 +31,11 @@ export const DEFAULT_TOOL_NAMES = {
     UNDO: "undo",
     REDO: "redo",
     FULLSCREEN: "fullscreen",
-} as const;
+};
 
 const DEFAULT_TOOL_ICON_CLASS = "w-4 h-4";
 
-export const DEFAULT_BUILTIN_TOOLS: Tool[] = [
+export const DEFAULT_TOOLS: Tool[] = [
     {
         name: DEFAULT_TOOL_NAMES.PENCIL,
         btnIcon: <img src={pencilIcon} alt="Pencil tool" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
@@ -57,3 +57,5 @@ export const DEFAULT_BUILTIN_TOOLS: Tool[] = [
         btnIcon: <img src={fullScrIcon} alt="Full screen" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
     },
 ];
+
+export const SPECIAL_TOOLS = [DEFAULT_TOOL_NAMES.PENCIL, DEFAULT_TOOL_NAMES.UNDO, DEFAULT_TOOL_NAMES.REDO, DEFAULT_TOOL_NAMES.FULLSCREEN];
