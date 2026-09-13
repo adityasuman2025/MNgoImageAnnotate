@@ -1,6 +1,6 @@
 import { memo, useCallback, useSyncExternalStore } from "react";
 import type { Tool } from "../types";
-import { DEFAULT_TOOL_NAMES } from "../constants";
+import { DEFAULT_TOOL_NAMES, DEFAULT_TOOLS } from "../constants";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 import globalStore from "../store";
 
@@ -20,7 +20,7 @@ export function ToolButton({ tool, isActive, onClick }: ToolButtonProps) {
                 e.stopPropagation();
                 onClick?.(tool)
             }}
-            className={`p-1.5 rounded-md transition-colors cursor-pointer flex items-center justify-center ${isActive
+            className={`p-1 rounded-md transition-colors cursor-pointer flex items-center justify-center ${isActive
                 ? "bg-teal-100 text-teal-800 ring-1 ring-teal-400"
                 : "hover:bg-gray-200 text-gray-600 active:bg-gray-200"
                 }`}
@@ -38,7 +38,7 @@ function Toolbar({
 }: ToolbarProps) {
     const activeToolName = useSyncExternalStore(globalStore.subscribeToActiveToolName, globalStore.getActiveToolName);
 
-    const { compRootRef, readonly, title, allTools } = useGlobalStaticData();
+    const { compRootRef, readonly, tools } = useGlobalStaticData();
 
     const handleToolClick = useCallback((tool: Tool) => {
         if (readonly) return;
@@ -59,6 +59,9 @@ function Toolbar({
             globalStore.setActiveToolName(null);
 
             // to-do: handle redo
+        } else if (tool.name === DEFAULT_TOOL_NAMES.RESET) {
+            globalStore.setActiveToolName(null);
+            globalStore.clearAnnotationData();
         } else {
             globalStore.setActiveToolName(prev => prev === tool.name ? null : tool.name);
 
@@ -75,12 +78,19 @@ function Toolbar({
             data-toolbar
             className={`sticky top-0 flex items-center justify-between px-3 py-2 bg-white/70 backdrop-blur-md border-b border-gray-200/80 z-1 select-none transition-colors ${className}`}
         >
-            <div className="text-sm font-semibold text-gray-700">
-                {title}
+            <div className={`flex items-center gap-1.5 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
+                {DEFAULT_TOOLS.map((tool) => (
+                    <ToolButton
+                        key={tool.name}
+                        tool={tool}
+                        isActive={activeToolName === tool.name}
+                        onClick={handleToolClick}
+                    />
+                ))}
             </div>
 
-            <div className={`flex items-center gap-1 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
-                {allTools.map((tool) => (
+            <div className={`flex items-center gap-1.5 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
+                {tools?.map((tool) => (
                     <ToolButton
                         key={tool.name}
                         tool={tool}

@@ -1,13 +1,14 @@
 import { useMemo, isValidElement, cloneElement, type ReactNode } from "react";
+import type { Tool } from "../types";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 
 export default function useToolIcon(name?: string): ReactNode {
-    const { allTools } = useGlobalStaticData();
+    const { tools } = useGlobalStaticData();
 
     return useMemo(() => {
         if (!name) return null;
 
-        const elementToolData = allTools?.find(i => i.name === name);
+        const elementToolData = tools?.find((i: Tool) => i.name === name);
         if (!elementToolData) return null;
 
         const rawToolIcon = elementToolData?.elementIcon || elementToolData?.btnIcon;
@@ -16,5 +17,5 @@ export default function useToolIcon(name?: string): ReactNode {
         return isValidElement<{ className?: string }>(rawToolIcon)
             ? cloneElement(rawToolIcon, { className: "w-full h-full object-contain pointer-events-none select-none" })
             : rawToolIcon;
-    }, [allTools, name]);
+    }, [tools, name]);
 }

@@ -3,6 +3,7 @@ import pencilIcon from "./images/pencilToolIcon.svg";
 import textIcon from "./images/textToolIcon.svg";
 import undoIcon from "./images/undoToolIcon.svg";
 import redoIcon from "./images/redoToolIcon.svg";
+import resetIcon from "./images/resetToolIcon.svg";
 import fullScrIcon from "./images/fullScrToolIcon.svg";
 
 export const DEFAULT_ELEMENT_DIMENSIONS: Dimensions = {
@@ -26,23 +27,19 @@ export const RESIZE_HANDLE_BASE =
     "absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 bg-white border-2 border-teal-600 rounded-full cursor-nwse-resize shadow-sm hover:scale-125 transition-transform pointer-events-auto";
 
 export const DEFAULT_TOOL_NAMES = {
-    PENCIL: "pencil",
-    TEXT: "text",
+    FULLSCREEN: "fullscreen",
     UNDO: "undo",
     REDO: "redo",
-    FULLSCREEN: "fullscreen",
+    RESET: "reset",
+    PENCIL: "pencil",
+    TEXT: "text",
 };
 
 const DEFAULT_TOOL_ICON_CLASS = "w-4 h-4";
-
 export const DEFAULT_TOOLS: Tool[] = [
     {
-        name: DEFAULT_TOOL_NAMES.PENCIL,
-        btnIcon: <img src={pencilIcon} alt="Pencil tool" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
-    },
-    {
-        name: DEFAULT_TOOL_NAMES.TEXT,
-        btnIcon: <img src={textIcon} alt="Text tool" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
+        name: DEFAULT_TOOL_NAMES.FULLSCREEN,
+        btnIcon: <img src={fullScrIcon} alt="Full screen" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
     },
     {
         name: DEFAULT_TOOL_NAMES.UNDO,
@@ -53,9 +50,17 @@ export const DEFAULT_TOOLS: Tool[] = [
         btnIcon: <img src={redoIcon} alt="Redo" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
     },
     {
-        name: DEFAULT_TOOL_NAMES.FULLSCREEN,
-        btnIcon: <img src={fullScrIcon} alt="Full screen" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
+        name: DEFAULT_TOOL_NAMES.RESET,
+        btnIcon: <img src={resetIcon} alt="Reset" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
+    },
+    {
+        name: DEFAULT_TOOL_NAMES.PENCIL,
+        btnIcon: <img src={pencilIcon} alt="Pencil tool" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
+    },
+    {
+        name: DEFAULT_TOOL_NAMES.TEXT,
+        btnIcon: <img src={textIcon} alt="Text tool" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
     },
 ];
 
-export const SPECIAL_TOOLS = [DEFAULT_TOOL_NAMES.PENCIL, DEFAULT_TOOL_NAMES.UNDO, DEFAULT_TOOL_NAMES.REDO, DEFAULT_TOOL_NAMES.FULLSCREEN];
+export const SPECIAL_TOOLS = Object.values(DEFAULT_TOOL_NAMES);

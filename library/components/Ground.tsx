@@ -1,20 +1,18 @@
-import { memo, useState, useEffect, useCallback, useSyncExternalStore, useRef } from "react";
+import { memo, useState, useCallback, useSyncExternalStore } from "react";
 import Element from "./Element";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 import globalStore from "../store";
 import type { Annotation } from "../types";
 import { useScaleFactor } from "../context/ScaleFactorContext";
 import { DEFAULT_ELEMENT_DIMENSIONS, DEFAULT_ELEMENT_ROTATION, SPECIAL_TOOLS } from "../constants";
+import { clampToBoundary } from "../utils/boundary";
 
 function Ground() {
-    const groundRef = useRef<HTMLDivElement>(null);
-
-    const { readonly } = useGlobalStaticData();
+    const { readonly, bgRef, bgBaseDimn } = useGlobalStaticData();
     const { scaleFactorRef } = useScaleFactor();
 
     const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
-
-    const annotationIds = useSyncExternalStore(globalStore.subscribeToAnnotationData, globalStore.getAllAnnotationIds);
+    const annotationIds = useSyncExternalStore(globalStore.subscribeToAnnotationIds, globalStore.getAllAnnotationIds);
 
     function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
         if (readonly) return;
@@ -31,12 +29,22 @@ function Ground() {
             // if any tool is selected from the tool bar then adding it on the ground if they are not specially abled tools 
             const activeToolName = globalStore.getActiveToolName();
             if (activeToolName && !SPECIAL_TOOLS?.includes(activeToolName)) {
-                const groundEl = groundRef.current;
-                if (!groundEl) return;
+                const bgEl = bgRef.current;
+                if (!bgEl) return;
 
-                const groundEleRect = groundEl.getBoundingClientRect();
-                const x = (e.clientX - groundEleRect.left) / scaleFactorRef.current.x - DEFAULT_ELEMENT_DIMENSIONS.width / 2;
-                const y = (e.clientY - groundEleRect.top) / scaleFactorRef.current.y - DEFAULT_ELEMENT_DIMENSIONS.height / 2;
+                const bgEleRect = bgEl.getBoundingClientRect();
+                const targetPos = {
+                    x: (e.clientX - bgEleRect.left) / scaleFactorRef.current.x - DEFAULT_ELEMENT_DIMENSIONS.width / 2,
+                    y: (e.clientY - bgEleRect.top) / scaleFactorRef.current.y - DEFAULT_ELEMENT_DIMENSIONS.height / 2,
+                };
+
+                const { x, y } = clampToBoundary({
+                    targetPos,
+                    elementDimensions: DEFAULT_ELEMENT_DIMENSIONS,
+                    bgBaseDimn,
+                    bgElement: bgEl,
+                    scaleFactor: scaleFactorRef.current,
+                });
 
                 const nextZIndex = globalStore.getHighestZIndex() + 1;
                 globalStore.setHighestZIndex(nextZIndex);
@@ -65,11 +73,12 @@ function Ground() {
         setSelectedElementId(id);
     }, [readonly]);
 
+    console.log("Ground render");
+
     return (
         <div
-            ref={groundRef}
             onPointerDown={handlePointerDown}
-            className={`w-full absolute inset-0 flex-1 relative ${readonly ? "pointer-events-none select-none" : ""}`}
+            className={`w-full absolute inset-0 flex-1 relative overflow-hidden ${readonly ? "pointer-events-none select-none" : ""}`}
         >
             {
                 annotationIds.map(id => (

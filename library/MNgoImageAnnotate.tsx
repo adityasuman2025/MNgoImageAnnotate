@@ -2,26 +2,26 @@ import { memo, useRef, useMemo } from "react";
 import GlobalStaticDataContextWrapper from "./context/GlobalStaticDataContext";
 import ScaleFactorProvider from "./context/ScaleFactorContext";
 import useContainerScaling from "./hooks/useContainerScaling";
+import useAnnotationDataSync from "./hooks/useAnnotationDataSync";
 import Image from "./components/Image";
 import Ground from "./components/Ground";
 import Toolbar from "./components/Toolbar";
-import type { MNgoImageAnnotateProps, Tool } from "./types";
-import { DEFAULT_TOOLS } from "./constants";
+import type { MNgoImageAnnotateProps } from "./types";
 import './index.css';
 
 function MNgoImageAnnotate({
     imgSrc,
     readonly = false,
-    title,
     tools,
+    annotationData,
+    onAnnotationDataChange,
 }: MNgoImageAnnotateProps) {
     const compRootRef = useRef<HTMLDivElement | null>(null);
     const bgRef = useRef<HTMLElement | null>(null);
 
+    useAnnotationDataSync({ annotationData, onAnnotationDataChange });
+
     const { toScale, bgBaseDimn, scaleFactorRef, updateBaseDimensions } = useContainerScaling({ bgRef, compRootRef, imgSrc });
-
-    const allTools: Tool[] = useMemo(() => ([...(tools || []), ...DEFAULT_TOOLS]), [tools]);
-
     const staticData = useMemo(() => ({
         readonly,
         imgSrc,
@@ -30,16 +30,14 @@ function MNgoImageAnnotate({
         bgBaseDimn,
         compRootRef,
         tools,
-        allTools,
-        title,
-    }), [readonly, imgSrc, toScale, bgBaseDimn, tools, allTools, title]);
+    }), [readonly, imgSrc, toScale, bgBaseDimn, tools]);
 
     return (
         <GlobalStaticDataContextWrapper data={staticData}>
             <ScaleFactorProvider scaleFactorRef={scaleFactorRef}>
                 <div
                     ref={compRootRef}
-                    className="flex flex-col justify-between w-full h-full flex-1 min-h-96 overflow-hidden"
+                    className="bg-gray-100 flex flex-col justify-between w-full h-full flex-1 min-h-96 overlfow-y-auto overflow-x-hidden"
                 >
                     <Toolbar />
 
@@ -67,4 +65,5 @@ function MNgoImageAnnotate({
         </GlobalStaticDataContextWrapper>
     );
 }
+
 export default memo(MNgoImageAnnotate);

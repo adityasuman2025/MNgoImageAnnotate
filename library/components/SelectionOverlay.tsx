@@ -27,7 +27,7 @@ function SelectionOverlay({
     return (
         <div
             data-selection-overlay
-            className="absolute -inset-1.5 pointer-events-none"
+            className="absolute -inset-0 pointer-events-none"
         >
             <div data-outline-box className="absolute inset-0 border-2 border-teal-500 rounded-md pointer-events-none" />
 

@@ -17,9 +17,9 @@ const state: GlobalState = {
 };
 
 const activeToolNameSubscribers = new Set<Callback>(); // will be used to track change in activeToolName -> will be used in ToolBar comp
-const annotationDataSubscribers = new Set<Callback>(); // will be used to track addition/removal of any annotion Element -> will be used in Ground comp
+const annotationIdsSubscribers = new Set<Callback>(); // will be used to track addition/removal of any annotion Element -> will be used in Ground comp
 const annotationByIdSubscribers = new Map<AnnotationId, Set<Callback>>(); // will be used to track change any specific annotation Element by its id -> will be used in Element comp
-const annotationAnyChangeSubscribers = new Set<Callback>(); // will be used to track any single change on annotationData (addition/removal/updation) -> will be used for onChange prop of MNgoImageAnnotate comp
+const annotationDataSubscribers = new Set<Callback>(); // will be used to track any single change on annotationData (addition/removal/updation) -> will be used for onChange prop of MNgoImageAnnotate comp
 
 const globalStore = {
     // for active tool name
@@ -45,25 +45,46 @@ const globalStore = {
     getAllAnnotationIds(): AnnotationId[] {
         return state?.annotationData?.annotationIds;
     },
+    subscribeToAnnotationIds(cb: Callback) {
+        annotationIdsSubscribers.add(cb);
+
+        return () => annotationIdsSubscribers.delete(cb);
+    },
+
+
+    // for getting complete annotation data (will be used in MNgoImageAnnotate comp)
+    getAnnotationData(): AnnotationData {
+        return state?.annotationData;
+    },
     setAnnotationData: function (annotationData: AnnotationData) {
-        state.annotationData = annotationData;
+        if (!annotationData || state.annotationData === annotationData) return;
 
-        annotationByIdSubscribers.forEach((val, key) => {
-            val.forEach(cb => cb());
-        });
+        const highestZIndex = annotationData.highestZIndex ?? Math.max(0, ...Object.values(annotationData.annotations || {}).map(a => a.zIndex || 0));
 
-        annotationAnyChangeSubscribers.forEach(cb => cb());
+        state.annotationData = { ...annotationData, highestZIndex };
+
+        annotationByIdSubscribers.forEach((val, key) => val.forEach(cb => cb()));
+        annotationIdsSubscribers.forEach(cb => cb());
+        annotationDataSubscribers.forEach(cb => cb());
+    },
+    clearAnnotationData() {
+        if (state.annotationData.annotationIds.length === 0) return;
+
+        state.annotationData = {
+            annotations: {},
+            annotationIds: [],
+            highestZIndex: 0,
+        };
+
+        annotationByIdSubscribers.forEach((val) => val.forEach(cb => cb()));
+        annotationByIdSubscribers.clear();
+        annotationIdsSubscribers.forEach(cb => cb());
         annotationDataSubscribers.forEach(cb => cb());
     },
     subscribeToAnnotationData(cb: Callback) {
         annotationDataSubscribers.add(cb);
 
         return () => annotationDataSubscribers.delete(cb);
-    },
-    subscribeToAnyAnnotationChange(cb: Callback) {
-        annotationAnyChangeSubscribers.add(cb);
-
-        return () => annotationAnyChangeSubscribers.delete(cb);
     },
 
 
@@ -74,32 +95,32 @@ const globalStore = {
     updateAnnotationById(id: AnnotationId, data: Annotation) {
         const isNew = !Object.hasOwn(state.annotationData.annotations, id);
 
-        state.annotationData.annotations = {
-            ...state.annotationData.annotations,
-            [id]: data,
-        };
+        const annotations = { ...state.annotationData.annotations, [id]: data };
+        const annotationIds = isNew ? [...state.annotationData.annotationIds, id] : state.annotationData.annotationIds;
 
-        if (isNew) {
-            state.annotationData.annotationIds = [...state.annotationData.annotationIds, id];
-            annotationDataSubscribers.forEach(cb => cb());
+        state.annotationData = {
+            ...state.annotationData,
+            annotations,
+            annotationIds
         }
 
-        annotationAnyChangeSubscribers.forEach(cb => cb());
-
-        // notify fine-grained listeners (Element component) for this specific annotation
-        annotationByIdSubscribers.get(id)?.forEach(cb => cb());
+        annotationByIdSubscribers.get(id)?.forEach(cb => cb());  // notify fine-grained listeners (Element component) for this specific annotation
+        if (isNew) annotationIdsSubscribers.forEach(cb => cb());
+        annotationDataSubscribers.forEach(cb => cb());
     },
     removeAnnotationById(id: AnnotationId) {
         if (!Object.hasOwn(state.annotationData.annotations, id)) return;
 
         const { [id]: _, ...rest } = state.annotationData.annotations;
-        state.annotationData.annotations = rest;
 
-        state.annotationData.annotationIds = state.annotationData.annotationIds.filter(currId => currId !== id);
+        state.annotationData = {
+            ...state.annotationData,
+            annotations: rest,
+            annotationIds: state.annotationData.annotationIds.filter(currId => currId !== id)
+        }
 
         annotationByIdSubscribers.delete(id);
-
-        annotationAnyChangeSubscribers.forEach(cb => cb());
+        annotationIdsSubscribers.forEach(cb => cb());
         annotationDataSubscribers.forEach(cb => cb());
     },
     subscribeToAnnotationById(id: AnnotationId, cb: Callback) {

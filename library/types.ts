@@ -9,8 +9,9 @@ export interface Tool {
 export interface MNgoImageAnnotateProps {
     readonly?: boolean;
     imgSrc?: string;
-    title?: ReactNode;
     tools?: Tool[];
+    annotationData?: AnnotationData;
+    onAnnotationDataChange?: (newData: AnnotationData) => void;
 }
 
 export interface Coordinates {

@@ -6,7 +6,6 @@ interface StaticDataType extends MNgoImageAnnotateProps {
     bgRef: RefObject<HTMLElement | null>;
     bgBaseDimn: Dimensions | null;
     compRootRef: RefObject<HTMLDivElement | null>;
-    allTools: Tool[],
 }
 const GlobalStaticDataContext = createContext<StaticDataType | null>(null);
 

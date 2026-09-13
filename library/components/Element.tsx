@@ -7,6 +7,7 @@ import useAnnotation from "../hooks/useAnnotation";
 import useToolIcon from "../hooks/useToolIcon";
 import { createGestureCleanup } from "../utils/gesture";
 import updateAnnotationById from "../utils/updateAnnotationById";
+import { clampToBoundary } from "../utils/boundary";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 
 export interface ElementProps {
@@ -21,14 +22,12 @@ function Element({
 }: ElementProps) {
     const elementRef = useRef<HTMLDivElement>(null);
 
-    const { readonly } = useGlobalStaticData();
+    const { readonly, bgRef, bgBaseDimn } = useGlobalStaticData();
     const { scaleFactorRef } = useScaleFactor();
     const cleanupDragRef = useUnmountCleanup(); // cleaning up the pointer window events and raf on un-mount
 
     const { name, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef } = useAnnotation(id);
     const toolIcon = useToolIcon(name);
-
-    console.log("Element render")
 
     const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (readonly) return;
@@ -52,8 +51,21 @@ function Element({
         function onPointerMove(moveEvent: PointerEvent) {
             const diffX = moveEvent.clientX - dragStartPosX, diffY = moveEvent.clientY - dragStartPosY;
 
-            newX = currPosX + diffX / currScaleFactor.x;
-            newY = currPosY + diffY / currScaleFactor.y;
+            const targetPos = {
+                x: currPosX + diffX / currScaleFactor.x,
+                y: currPosY + diffY / currScaleFactor.y,
+            };
+
+            const clampedPos = clampToBoundary({
+                targetPos,
+                elementDimensions: dimensionsRef.current ?? { width: 0, height: 0 },
+                bgBaseDimn,
+                bgElement: bgRef.current,
+                scaleFactor: currScaleFactor,
+            });
+
+            newX = clampedPos.x;
+            newY = clampedPos.y;
 
             if (rafId === null) {
                 rafId = requestAnimationFrame(() => {
@@ -83,7 +95,9 @@ function Element({
 
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
-    }, [id, onSelect, readonly]);
+    }, [id, onSelect, readonly, bgBaseDimn]);
+
+    console.log("Element render");
 
     return (
         <div
