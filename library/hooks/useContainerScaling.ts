@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect, useCallback, type RefObject } from "react";
+import { useRef, useEffect, useCallback, type RefObject } from "react";
 import type { Dimensions, ScaleFactors } from "../types";
+
+const MIN_HEIGHT = 300;
 
 interface UseContainerScalingOptions {
     bgRef: RefObject<HTMLElement | null>;
@@ -12,71 +14,76 @@ export default function useContainerScaling({
     imgSrc,
 }: UseContainerScalingOptions) {
     const toScale = !!imgSrc;
-    const [bgBaseDimn, setBgBaseDimn] = useState<Dimensions | null>(null);
+
+    const bgBaseDimnRef = useRef<Dimensions | null>(null); // original dimension (height, width) of the background image
+    const bgCurrDimnRef = useRef<Dimensions | null>(null); // current (rendered) dimensions (width, height) of the background element
     const scaleFactorRef = useRef<ScaleFactors>({ x: 1, y: 1 });
 
     useEffect(() => {
-        setBgBaseDimn(null);
+        bgBaseDimnRef.current = null;
     }, [imgSrc]); // reset base dimensions whenever the image source changes
 
-    const updateBaseDimensions = useCallback((dimn: Dimensions) => {
-        setBgBaseDimn(dimn);
-    }, []);
+    const updateScale = useCallback(() => {
+        const compRootEl = compRootRef?.current;
+        const bgEle = bgRef?.current;
+        const baseDimn = bgBaseDimnRef.current;
 
-    useEffect(() => {
-        const rootEl = compRootRef?.current;
+        if (!toScale) {
+            const parentHeight = Math.max(MIN_HEIGHT, compRootEl?.parentElement?.clientHeight || 0);
 
-        function resetScaleStyles() {
-            if (rootEl) {
-                rootEl.style.removeProperty("max-height");
-                rootEl.style.removeProperty("--scale-x");
-                rootEl.style.removeProperty("--scale-y");
+            if (compRootEl) {
+                compRootEl.style.height = `${parentHeight}px`;
+                compRootEl.style.removeProperty("--scale-x");
+                compRootEl.style.removeProperty("--scale-y");
+            }
+            if (bgEle) {
+                const toolbarHeight = (compRootEl?.firstElementChild?.clientHeight || 0) + 2;
+                bgEle.style.height = `${Math.max(0, parentHeight - toolbarHeight)}px`;
+                const dimn = { width: bgEle.clientWidth, height: bgEle.clientHeight };
+
+                bgCurrDimnRef.current = dimn;
+                bgBaseDimnRef.current = dimn;
             }
             scaleFactorRef.current = { x: 1, y: 1 };
+            return;
         }
 
-        if (!toScale || !bgBaseDimn) return resetScaleStyles();
-
-        const containerElement = bgRef?.current;
-        if (!containerElement || !rootEl) return;
-
-        let rafId: number | null = null;
-        function updateScale() {
-            const currentWidth = containerElement.clientWidth;
-            const currentHeight = containerElement.clientHeight;
-            if (!currentWidth || !currentHeight) return;
-
-
-            // Synchronously update ref so coordinate lookups are never lagging
-            scaleFactorRef.current = { x: currentWidth / bgBaseDimn.width, y: currentHeight / bgBaseDimn.height };
-
-            // storing the scale factor as var in style tags so that it can be directly applied in css for transform
-            if (rafId === null) {
-                rafId = requestAnimationFrame(() => {
-                    rafId = null;
-                    rootEl.style.setProperty('--scale-x', `${scaleFactorRef.current.x}`);
-                    rootEl.style.setProperty('--scale-y', `${scaleFactorRef.current.y}`);
-                    const toolbarHeight = (rootEl.firstElementChild?.clientHeight || 0) + 2;
-
-                    rootEl.style.maxHeight = `${bgBaseDimn.height * scaleFactorRef.current.y + toolbarHeight}px`;
-                });
-            }
+        if (!baseDimn || !bgEle || !compRootEl) {
+            bgCurrDimnRef.current = null;
+            scaleFactorRef.current = { x: 1, y: 1 };
+            return;
         }
 
+        const bgCurrWidth = bgEle.clientWidth, bgCurrHeight = bgEle.clientHeight;
+        if (!bgCurrWidth || !bgCurrHeight) return;
+
+        bgCurrDimnRef.current = { width: bgCurrWidth, height: bgCurrHeight };
+        scaleFactorRef.current = { x: bgCurrWidth / baseDimn.width, y: bgCurrHeight / baseDimn.height };
+
+        compRootEl.style.setProperty('--scale-x', `${scaleFactorRef.current.x}`);
+        compRootEl.style.setProperty('--scale-y', `${scaleFactorRef.current.y}`);
+        const toolbarHeight = (compRootEl.firstElementChild?.clientHeight || 0) + 2;
+        compRootEl.style.height = `${bgCurrHeight + toolbarHeight}px`;
+    }, [toScale]);
+
+    const updateBgBaseDimn = useCallback((dimn: Dimensions) => {
+        const prev = bgBaseDimnRef.current;
+        if (prev?.width === dimn.width && prev?.height === dimn.height) return;
+
+        bgBaseDimnRef.current = dimn;
         updateScale();
+    }, [updateScale]);
+
+    useEffect(() => {
+        updateScale();
+
+        const bgEle = bgRef?.current;
+        if (!bgEle) return;
+
         const resizeObserver = new ResizeObserver(updateScale);
-        resizeObserver.observe(containerElement);
-        return () => {
-            if (rafId !== null) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-            resizeObserver.disconnect();
+        resizeObserver.observe(bgEle);
+        return () => resizeObserver.disconnect();
+    }, [toScale, updateScale]);
 
-            resetScaleStyles();
-        }
-    }, [bgBaseDimn, toScale]);
-
-
-    return { toScale, bgBaseDimn, scaleFactorRef, updateBaseDimensions };
+    return { toScale, bgBaseDimnRef, bgCurrDimnRef, scaleFactorRef, updateBgBaseDimn };
 }

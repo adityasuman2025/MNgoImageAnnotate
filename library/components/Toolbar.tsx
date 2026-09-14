@@ -3,6 +3,8 @@ import type { Tool } from "../types";
 import { DEFAULT_TOOL_NAMES, DEFAULT_TOOLS } from "../constants";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 import globalStore from "../store";
+import { undo, redo } from "../utils/store";
+import useKeyboardShortcut from "../hooks/useKeyboardShortcut";
 
 export interface ToolButtonProps {
     tool: Tool;
@@ -40,11 +42,28 @@ export interface ToolbarProps {
 function Toolbar({
     className = "",
 }: ToolbarProps) {
+    const { compRootRef, readonly, tools } = useGlobalStaticData();
+
     const activeToolName = useSyncExternalStore(globalStore.subscribeToActiveToolName, globalStore.getActiveToolName);
     const isUndoDisabled = useSyncExternalStore(globalStore.subscribeToAnnotationData, globalStore.isUndoDisabled);
     const isRedoDisabled = useSyncExternalStore(globalStore.subscribeToAnnotationData, globalStore.isRedoDisabled);
 
-    const { compRootRef, readonly, tools } = useGlobalStaticData();
+    useKeyboardShortcut((e) => {
+        const isModifier = e.ctrlKey || e.metaKey;
+        if (!isModifier) return;
+
+        const key = e.key.toLowerCase();
+        // Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y
+        if (key === "y" || (e.shiftKey && key === "z")) {
+            e.preventDefault();
+            redo();
+        }
+        // Undo: Ctrl+Z / Cmd+Z (without Shift)
+        else if (key === "z") {
+            e.preventDefault();
+            undo();
+        }
+    }, !readonly);
 
     const handleToolClick = useCallback((tool: Tool) => {
         if (readonly) return;
@@ -57,30 +76,18 @@ function Toolbar({
                 if (rootEl?.requestFullscreen) rootEl.requestFullscreen().catch(() => { });
                 else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { });
             } else if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
-        } else if (tool.name === DEFAULT_TOOL_NAMES.UNDO) {
-            globalStore.setActiveToolName(null);
-
-            globalStore.undo();
-        } else if (tool.name === DEFAULT_TOOL_NAMES.REDO) {
-            globalStore.setActiveToolName(null);
-
-            globalStore.redo();
-        } else if (tool.name === DEFAULT_TOOL_NAMES.CLEAR_ALL) {
+        } else if (tool.name === DEFAULT_TOOL_NAMES.UNDO) undo();
+        else if (tool.name === DEFAULT_TOOL_NAMES.REDO) redo();
+        else if (tool.name === DEFAULT_TOOL_NAMES.CLEAR_ALL) {
             globalStore.setActiveToolName(null);
             globalStore.clearAnnotationData();
-        } else {
-            globalStore.setActiveToolName(prev => prev === tool.name ? null : tool.name);
-
-            if (tool.name === DEFAULT_TOOL_NAMES.PENCIL) {
-                // to-do: handle pencil
-            }
-        }
+        } else globalStore.setActiveToolName(prev => prev === tool.name ? null : tool.name);
     }, [readonly]);
 
     return (
         <div
             data-toolbar
-            className={`sticky top-0 flex items-center justify-between px-3 py-2 bg-white/70 backdrop-blur-md border-b border-gray-200/80 z-1 select-none transition-colors ${className}`}
+            className={`sticky top-0 z-1 flex items-center justify-between px-3 py-2 bg-white/70 backdrop-blur-md border-b border-gray-200/80 select-none transition-colors ${className}`}
         >
             <div className={`flex items-center gap-1.5 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
                 {DEFAULT_TOOLS.map((tool) => (

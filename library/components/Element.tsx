@@ -24,7 +24,7 @@ function Element({
 }: ElementProps) {
     const elementRef = useRef<HTMLDivElement>(null);
 
-    const { readonly, bgRef, bgBaseDimn } = useGlobalStaticData();
+    const { readonly, bgBaseDimnRef } = useGlobalStaticData();
     const { scaleFactorRef } = useScaleFactor();
     const cleanupDragRef = useUnmountCleanup(); // cleaning up the pointer window events and raf on un-mount
 
@@ -61,9 +61,7 @@ function Element({
             const clampedPos = clampToBoundary({
                 targetPos,
                 elementDimensions: dimensionsRef.current ?? { width: 0, height: 0 },
-                bgBaseDimn,
-                bgElement: bgRef.current,
-                scaleFactor: currScaleFactor,
+                bgBaseDimn: bgBaseDimnRef.current,
             });
 
             newX = clampedPos.x;
@@ -97,9 +95,7 @@ function Element({
 
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
-    }, [id, onSelect, readonly, bgBaseDimn]);
-
-    console.log("Element render");
+    }, [id, onSelect, readonly]);
 
     return (
         <div
@@ -129,14 +125,14 @@ function Element({
                 toolIcon
             )}
 
-            {isSelected && (
+            {isSelected && !readonly ? (
                 <SelectionOverlay
                     id={id}
                     elementRef={elementRef}
                     rotationRef={rotationRef}
                     dimensionsRef={dimensionsRef}
                 />
-            )}
+            ) : null}
         </div>
     );
 }

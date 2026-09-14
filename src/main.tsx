@@ -23,7 +23,6 @@ import gatewayIcon from "./assets/gatewayShape.svg";
 import MNgoImageAnnotate from "../library/MNgoImageAnnotate";
 import type { Tool, AnnotationData } from "../library/types";
 
-
 // indexedDB helper for image storage
 const DB_NAME = "mngo_annotate_db";
 const STORE_NAME = "images";
@@ -233,15 +232,17 @@ const ANNOTATION_DATA_KEY = "mngo_annotation_data";
 
 // component
 function App() {
-    const [annotationData, setAnnotationData] = useLocalStorage<AnnotationData>(ANNOTATION_DATA_KEY, { ...EMPTY_ANNOTATION_DATA });
+    const [isDBChecked, setIsDBChecked] = useState(false);
     const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
+    const [annotationData, setAnnotationData] = useLocalStorage<AnnotationData>(ANNOTATION_DATA_KEY, { ...EMPTY_ANNOTATION_DATA });
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         getImageFromDB()
             .then((saved) => {
                 if (saved) setImgSrc(saved);
-            });
+            })
+            .finally(() => setIsDBChecked(true));
     }, []);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,7 +263,7 @@ function App() {
     }, []);
 
     return (
-        <div className="bg-gray-100 min-h-dvh flex flex-col w-full">
+        <>
             <header className="flex items-center justify-between px-4 py-2.5 bg-white border-b border-gray-200 shadow-xs z-10">
                 <div className="flex items-center gap-2">
                     <span className="text-base font-bold text-gray-800 tracking-tight">MNgo Image Annotator</span>
@@ -286,13 +287,17 @@ function App() {
                 </div>
             </header>
 
-            <MNgoImageAnnotate
-                imgSrc={imgSrc}
-                tools={CUSTOM_TOOLS}
-                annotationData={annotationData}
-                onAnnotationDataChange={handleAnnotationDataChange}
-            />
-        </div>
+            <main className="flex flex-col mt-8 mx-8 border-t-1 border-zinc-300 rounded-xl overflow-hidden" style={{ height: `calc(100dvh - 80px)` }}>
+                {isDBChecked && (
+                    <MNgoImageAnnotate
+                        imgSrc={imgSrc}
+                        tools={CUSTOM_TOOLS}
+                        annotationData={annotationData}
+                        onAnnotationDataChange={handleAnnotationDataChange}
+                    />
+                )}
+            </main>
+        </>
     );
 }
 

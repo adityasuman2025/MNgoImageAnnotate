@@ -4,7 +4,8 @@ import type { MNgoImageAnnotateProps, Dimensions, Tool } from "../types";
 interface StaticDataType extends MNgoImageAnnotateProps {
     toScale: boolean;
     bgRef: RefObject<HTMLElement | null>;
-    bgBaseDimn: Dimensions | null;
+    bgBaseDimnRef: RefObject<Dimensions | null>;
+    bgCurrDimnRef: RefObject<Dimensions | null>;
     compRootRef: RefObject<HTMLDivElement | null>;
 }
 const GlobalStaticDataContext = createContext<StaticDataType | null>(null);

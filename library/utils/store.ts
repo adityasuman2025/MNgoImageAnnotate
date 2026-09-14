@@ -16,3 +16,25 @@ export function getAnnotationSnapshot(data: AnnotationData): AnnotationData {
         annotationIds: [...data.annotationIds],
     };
 }
+
+export function createAnnotationElement(
+    data: Omit<Annotation, "id" | "zIndex">,
+    prefix = "anno"
+): Annotation {
+    const nextZIndex = globalStore.getHighestZIndex() + 1;
+    globalStore.setHighestZIndex(nextZIndex);
+
+    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    return { ...data, id, zIndex: nextZIndex };
+}
+
+export function undo() {
+    globalStore.setActiveToolName(null);
+    globalStore.undo();
+}
+
+export function redo() {
+    globalStore.setActiveToolName(null);
+    globalStore.redo();
+}

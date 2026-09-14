@@ -26,5 +26,5 @@ export default function useAnnotation(id: AnnotationId) {
         posRef,
         rotationRef,
         dimensionsRef,
-    }), [data, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef]);
+    }), [data, pos, rotation, dimensions]);
 }

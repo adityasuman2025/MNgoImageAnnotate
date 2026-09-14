@@ -20,6 +20,9 @@ export const DEFAULT_ELEMENT_ROTATION = 0;
 
 export const MIN_ELEMENT_DIMENSIONS: Dimensions = DEFAULT_ELEMENT_DIMENSIONS;
 
+export const PENCIL_LINE_WIDTH = 3;
+export const PENCIL_STROKE_COLOR = "red";
+
 export const ACTION_BUTTON_BASE =
     "absolute left-1/2 -translate-x-1/2 w-6 h-6 p-1 border border-gray-200 rounded-full shadow-md flex items-center justify-center cursor-pointer transition-colors pointer-events-auto";
 

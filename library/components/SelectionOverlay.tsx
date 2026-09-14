@@ -5,6 +5,7 @@ import deleteIcon from "../images/deleteIcon.svg";
 import { ACTION_BUTTON_BASE, RESIZE_HANDLE_BASE } from "../constants";
 import type { AnnotationId, Dimensions } from "../types";
 import globalStore from "../store";
+import useKeyboardShortcut from "../hooks/useKeyboardShortcut";
 
 interface SelectionOverlayProps {
     id: AnnotationId;
@@ -18,6 +19,13 @@ function SelectionOverlay({
     rotationRef,
     dimensionsRef,
 }: SelectionOverlayProps) {
+
+    useKeyboardShortcut((e) => {
+        if (e.key === "Delete" || e.key === "Backspace") {
+            e.preventDefault();
+            globalStore.removeAnnotationById(id);
+        }
+    });
 
     function handleDeleteClick(e: MouseEvent<HTMLButtonElement>) {
         e.stopPropagation();
