@@ -30,3 +30,6 @@ yarn-error.log*
 public/coverage
 public/storybook
 /dist
+/library/node_modules
+/library/dist
+.next

@@ -1,49 +1,42 @@
 {
     "name": "react-image-annotate-mngo",
-    "version": "0.8.73",
-    "sideEffects": false,
-    "private": false,
+    "version": "1.0.0",
     "type": "module",
-    "homepage": "./",
-    "files": [
-        "dist",
-        "README.md"
-    ],
-    "main": "./dist/index.cjs.js",
+    "scripts": {
+        "dev": "npm run lib-build && vite",
+        "build": "npm run lib-build && tsc -b && vite build",
+        "lib-build": "vite build --config vite.config.lib.ts",
+        "prepublishOnly": "npm run lib-build"
+    },
+    "main": "./dist/index.umd.js",
     "module": "./dist/index.es.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/index.es.js",
-            "require": "./dist/index.cjs.js"
-        },
-        "./dist/style.css": "./dist/style.css"
+            "require": "./dist/index.umd.js",
+            "types": "./dist/index.d.ts"
+        }
     },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:adityasuman2025/MNgoImageAnnotate.git"
+    "files": [
+        "dist"
+    ],
+    "peerDependencies": {
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8"
     },
-    "scripts": {
-        "start": "concurrently \"npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --watch\" \"vite\" ",
-        "build": "npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --minify && tsc && IS_DEPL=true vite build",
-        "lib-build": "rm -rf dist && npx tailwindcss -i ./src/tailwind.css -c ./tailwind.config.cjs -o ./src/lib/index.css --minify && tsc && vite build",
-        "build-publish": "npm run lib-build && npm publish",
-        "demo": "cd demo && rm -rf node_modules && npm install && npm start"
-    },
-    "dependencies": {},
     "devDependencies": {
-        "@types/node": "17.0.23",
-        "@types/react": "^18.0.26",
-        "@types/react-dom": "^18.0.9",
-        "@vitejs/plugin-react": "^3.0.0",
-        "autoprefixer": "^10.4.13",
-        "concurrently": "^7.6.0",
-        "postcss": "^8.4.20",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "tailwindcss": "^3.2.4",
-        "typescript": "^4.9.3",
-        "vite": "^4.0.0",
-        "vite-plugin-css-injected-by-js": "^2.2.0"
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^24.13.3",
+        "@types/react": "^19.2.18",
+        "@types/react-dom": "^19.2.4",
+        "@vitejs/plugin-react": "^6.1.0",
+        "oxlint": "^1.79.0",
+        "path": "^0.12.7",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.2",
+        "vite": "^8.2.2",
+        "vite-plugin-css-injected-by-js": "^5.0.2",
+        "vite-plugin-dts": "^5.1.0"
     }
 }

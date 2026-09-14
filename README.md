@@ -1,168 +1,83 @@
 # react-image-annotate-mngo
 
-This library is available at [react-image-annotate-mngo](https://www.npmjs.com/package/react-image-annotate-mngo)
+A responsive, highly customizable React and TypeScript component library providing an interactive area over images for annotations, markups, drawing, and text.
+
+This library is available on npm at [react-image-annotate-mngo](https://www.npmjs.com/package/react-image-annotate-mngo).
+
+---
 
 ## Demo
 
 [annotate.adityas.site](https://annotate.adityas.site)
 
-## Brief:
+---
 
-A JavaScript React Library (npm package ) which provides an area over an image to annotation/markup/write.
-One can easily annotate over image in react.js by installing `react-image-annotate-mngo` package
+## Features
 
-## Screenshots:
+- **Interactive Canvas**: Annotate, sketch, mark up, and add custom shapes directly on top of any image.
+- **Tools Included**: Pencil drawing tool, text tool, undo, redo, delete, rotate, and full-screen support.
+- **Custom Shapes**: Extensible shape configuration for custom SVG/image stamps (rectangles, circles, custom icons).
+- **Dark Mode Support**: Seamless toggle between dark and light themes.
+- **Lightweight & Modular**: Written in React & TypeScript with zero heavy dependencies.
 
-<img src="screenshots/1.png" alt="screenshot 1">
-
-<img src="screenshots/2.png" alt="screenshot 2">
-
-<img src="screenshots/3.png" alt="screenshot 3">
-
-## Usage
-
-    <MNgoImageAnnotate
-        isViewMode={boolean}
-        isDarkMode={boolean}
-
-        compIdx={number}
-        compMaxHeight={string}
-        compMaxWidth={number}
-        
-        image={string | Image}
-        imgWidth={number}
-        loc={number[]}
-        
-        loadingRenderer={string | ReactElement}
-        errorRenderer={string | ReactElement}
-
-        textInputField={(textInputVal: string, setTextInputVal: Dispatch<SetStateAction<string>>) => ReactElement}
-        shapes={{ [key: string]: any }}
-        annotations={any[]}
-        onChange={(data: { [key: string]: any }) => void}
-    />
-
-`props example`
-
-1.  `isViewMode` to load component in view (non-editable mode)
-2.  `isDarkMode` to enable dark mode?, default value is false
-
-3.  `compIdx` unique index of the component when using `MNgoImageAnnotate` multiple time in view/screen/oage
-4.  `compMaxHeight` max height allowed to component (max height component can go to)
-5.  `compMaxWidth` max width allowed to component (max width component can go to)
-
-6.  `image` image of type JS Image object or image url/link, e.g. [https://tinypng.com/images/social/website.jpg](https://tinypng.com/images/social/website.jpg)
-7.  `imgWidth` width of the image, default value is 900
-8.  `loc` loc represents co-ordinates of visible portion of the image, i.e. [x1, y1, x2, y2]
-
-9.  `loadingRenderer` ReactElement or string to display while image is loading/downloading, default value is "loading"
-10.  `errorRenderer` ReactElement or string to display when image could not be loaded, default value is "something went wrong"
-
-11.  `textInputField` a function to render Text Tool Input Field,
-    e.g.
-
-            function (textInputVal, setTextInputVal) => {
-                return (
-                    <textarea
-                        autoFocus
-                        className="sa-h-[50px] sa-w-[95%] sa-resize-none sa-border-[lightgrey] sa-shadow-md sa-rounded-md"
-                        value={textInputVal}
-                        onChange={(e) => setTextInputVal(e.target.value)}
-                    />
-                )
-            }
-
-12. `shapes` shape button in tool bar
-
-            {
-                <shape type | title>: { btnIcon: <string | Image>, img: <string | Image> },
-            }
-
-
-        e.g.
-
-
-            {
-                tick: { btnIcon: tickShape, img: tickShape },
-                cross: { btnIcon: crossShape, img: crossShape },
-            }
-
-13. `annotations` array of annotations present on the image
-
-            [
-                {
-                    "type": <shape type or title>,
-                    "pos": { "x": number, "y": number },
-                    "size": { "height": number, "width": number },
-                },
-                {
-                    "type": "pencil,
-                    "pts": [number, number][],
-                },
-                {
-                    "type": "pencil,
-                    "pos": { "x": number, "y": number },
-                    "size": { "height": number, "width": number },
-                    "html": string,
-                }
-            ]
-
-
-        e.g.
-
-
-            [
-                {
-                    "type": "cross",
-                    "pos": { "x": 757, "y": 224 },
-                    "size": { "height": 50, "width": 50 },
-                },
-                {
-                    "type": "pencil",
-                    "pts":[ [878,96],[878,98],[878,102],[878,122],[878,168],[874,224],[872,281],[872,331],[872,363] ],
-                },
-                {
-                    "type": "pencil",
-                    "pos": { "x": 408, "y": 115 },
-                    "size": { "height": 62 , "width": 126},
-                    "html": "hello world",
-                }
-            ]
-
-14. `onChange` callback function run when any change is done on annotations
-
-        onChange (annotationData: object) => void
-
-        `annotationData` is { imgWidth: number, annotations: annotations[]}
+---
 
 ## Installation
 
-1. npm install
-2. npm start
+```bash
+npm install react-image-annotate-mngo
+```
 
-## Available Scripts
+---
 
-In the project directory, you can run
+## Usage
 
-### `npm start`
+```tsx
+import React, { useState } from 'react';
+import { MNgoImageAnnotate } from 'react-image-annotate-mngo';
+import 'react-image-annotate-mngo/style.css';
 
-Runs the app in the development mode
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+export default function AnnotateDemo() {
+  const [annotations, setAnnotations] = useState([]);
 
-### `npm run lib-build`
+  return (
+    <MNgoImageAnnotate
+      image="https://tinypng.com/images/social/website.jpg"
+      imgWidth={900}
+      isDarkMode={false}
+      annotations={annotations}
+      onChange={(data) => {
+        console.log("Updated annotations:", data);
+        setAnnotations(data.annotations);
+      }}
+    />
+  );
+}
+```
 
-it is for final package build which create `dist` folder.
+---
 
-### `npm publish`
+## Component Props
 
-to publish the project on npm
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `image` | `string` | `undefined` | URL or base64 string of the image to annotate. |
+| `imgWidth` | `number` | `900` | Display width of the image. |
+| `isViewMode` | `boolean` | `false` | When true, renders canvas in read-only / view-only mode. |
+| `isDarkMode` | `boolean` | `false` | Toggles dark theme styling. |
+| `compIdx` | `number` | `0` | Unique component index when using multiple instances on one page. |
+| `compMaxHeight` | `string` | `undefined` | Maximum height constraint for the component (e.g. `'100vh'`). |
+| `compMaxWidth` | `number` | `undefined` | Maximum width constraint for the component. |
+| `loc` | `number[]` | `undefined` | Coordinates `[x1, y1, x2, y2]` of the visible portion of the image. |
+| `loadingRenderer` | `string \| ReactElement` | `'loading'` | Custom loader element while image is loading. |
+| `errorRenderer` | `string \| ReactElement` | `'something went wrong'` | Custom error display if image fails to load. |
+| `textInputField` | `function` | `undefined` | Custom render function for text tool input field. |
+| `shapes` | `object` | `{}` | Key-value mapping of custom shape buttons and icons. |
+| `annotations` | `any[]` | `[]` | Current array of annotations on the image. |
+| `onChange` | `(data) => void` | `undefined` | Callback invoked whenever annotations change. |
 
-`Note`: do `npm run lib-build` before `npm publish` because it publishes dist folder as defined as key main, module, files in package.json, and do not forget to login in npm using `npm login`
-
-### `npm run build-publish`
-
-this command make build of the project and publishes it, basically it is combination of `npm run babel-build` and `npm publish`
+---
 
 ## License
 
-All rights reserved under MNgo.
+MIT © Aditya Suman
