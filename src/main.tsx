@@ -20,8 +20,13 @@ import loadBalancerIcon from "./assets/loadBalancerShape.svg";
 import queueIcon from "./assets/queueShape.svg";
 import cacheIcon from "./assets/cacheShape.svg";
 import gatewayIcon from "./assets/gatewayShape.svg";
-import MNgoImageAnnotate from "../library/MNgoImageAnnotate";
-import type { Tool, AnnotationData } from "../library/types";
+
+// @ts-ignore
+import MNgoImageAnnotate from "../dist/index.es.js";
+import type { Tool, AnnotationData } from "../dist/types";
+
+// import MNgoImageAnnotate from "../library/MNgoImageAnnotate";
+// import type { Tool, AnnotationData } from "../library/types";
 
 // indexedDB helper for image storage
 const DB_NAME = "mngo_annotate_db";
