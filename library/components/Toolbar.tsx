@@ -10,7 +10,7 @@ export interface ToolButtonProps {
     disabled?: boolean;
     onClick?: (tool: Tool) => void;
 }
-export function ToolButton({ tool, isActive = false, disabled = false, onClick }: ToolButtonProps) {
+const ToolButton = memo(function ({ tool, isActive = false, disabled = false, onClick }: ToolButtonProps) {
     return (
         <button
             type="button"
@@ -32,7 +32,7 @@ export function ToolButton({ tool, isActive = false, disabled = false, onClick }
             {tool.btnIcon}
         </button>
     );
-}
+});
 
 export interface ToolbarProps {
     className?: string;
@@ -73,8 +73,6 @@ function Toolbar({
 
             if (tool.name === DEFAULT_TOOL_NAMES.PENCIL) {
                 // to-do: handle pencil
-            } else if (tool.name === DEFAULT_TOOL_NAMES.TEXT) {
-                // to-do: handle text
             }
         }
     }, [readonly]);

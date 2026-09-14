@@ -40,6 +40,7 @@ export interface Annotation {
     pos?: Coordinates,
     rotation?: number,
     dimensions?: Dimensions,
+    text?: string,
 
     points?: FreeDrawPoints[], // if name is pencil -> means its free draw -> only then we will have points
 }

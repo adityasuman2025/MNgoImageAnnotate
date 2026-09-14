@@ -9,6 +9,8 @@ import { createGestureCleanup } from "../utils/gesture";
 import updateAnnotationById from "../utils/store";
 import { clampToBoundary } from "../utils/boundary";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
+import { DEFAULT_TOOL_NAMES } from "../constants";
+import TextElement from "./TextElement";
 
 export interface ElementProps {
     id: string;
@@ -26,7 +28,7 @@ function Element({
     const { scaleFactorRef } = useScaleFactor();
     const cleanupDragRef = useUnmountCleanup(); // cleaning up the pointer window events and raf on un-mount
 
-    const { name, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef } = useAnnotation(id);
+    const { name, text, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef } = useAnnotation(id);
     const toolIcon = useToolIcon(name);
 
     const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -116,7 +118,16 @@ function Element({
                 ...getElementTransformVariables(pos, rotation),
             }}
         >
-            {toolIcon}
+            {name === DEFAULT_TOOL_NAMES.TEXT ? (
+                <TextElement
+                    id={id}
+                    initialText={text}
+                    isSelected={isSelected}
+                    readonly={readonly}
+                />
+            ) : (
+                toolIcon
+            )}
 
             {isSelected && (
                 <SelectionOverlay

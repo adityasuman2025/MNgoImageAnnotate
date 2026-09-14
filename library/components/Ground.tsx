@@ -4,7 +4,7 @@ import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 import globalStore from "../store";
 import type { Annotation } from "../types";
 import { useScaleFactor } from "../context/ScaleFactorContext";
-import { DEFAULT_ELEMENT_DIMENSIONS, DEFAULT_ELEMENT_ROTATION, SPECIAL_TOOLS } from "../constants";
+import { DEFAULT_ELEMENT_DIMENSIONS, DEFAULT_ELEMENT_ROTATION, DEFAULT_TOOL_NAMES, SPECIAL_TOOLS } from "../constants";
 import { clampToBoundary } from "../utils/boundary";
 
 function Ground() {
@@ -26,9 +26,14 @@ function Ground() {
         } else {
             setSelectedElementId(null); // resetting the selected element on clicking anywhere else
 
-            // if any tool is selected from the tool bar then adding it on the ground if they are not specially abled tools 
             const activeToolName = globalStore.getActiveToolName();
-            if (activeToolName && !SPECIAL_TOOLS?.includes(activeToolName)) {
+            if (!activeToolName) return;
+
+            const isTextTool = activeToolName === DEFAULT_TOOL_NAMES.TEXT;
+            const isAddableTool = isTextTool || !SPECIAL_TOOLS.includes(activeToolName);
+
+            // if any tool is selected from the tool bar then adding it on the ground if they are not specially abled tools (except for the Text tool)
+            if (isAddableTool) {
                 const bgEl = bgRef.current;
                 if (!bgEl) return;
 
@@ -57,7 +62,8 @@ function Ground() {
                     zIndex: nextZIndex,
                     pos: { x, y },
                     dimensions: DEFAULT_ELEMENT_DIMENSIONS,
-                    rotation: DEFAULT_ELEMENT_ROTATION
+                    rotation: DEFAULT_ELEMENT_ROTATION,
+                    ...(isTextTool ? { text: "" } : {})
                 };
 
                 globalStore.updateAnnotationById(id, annotationElement);
