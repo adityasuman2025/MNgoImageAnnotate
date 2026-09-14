@@ -49,3 +49,6 @@ export interface AnnotationData {
     annotations: Record<AnnotationId, Annotation>,
     highestZIndex: number,
 }
+
+export type Callback = () => void;
+export type ActiveToolName = string | null;

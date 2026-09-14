@@ -73,8 +73,6 @@ function Ground() {
         setSelectedElementId(id);
     }, [readonly]);
 
-    console.log("Ground render");
-
     return (
         <div
             onPointerDown={handlePointerDown}

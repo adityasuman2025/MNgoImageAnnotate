@@ -175,7 +175,7 @@ const CUSTOM_TOOLS: Tool[] = [
         btnIcon: <img src={houseIcon} alt="House" className="w-4 h-4" draggable={false} />,
     },
 ];
-const ANNOTATION_DATA: AnnotationData = {
+const DUMMY_ANNOTATION_DATA: AnnotationData = {
     "annotationIds": [
         "1d9bce18-c35f-4f02-9ca5-b170c3815c6d",
         "67235752-cad1-4919-847f-b3b8edd58fcd",
@@ -227,12 +227,13 @@ const ANNOTATION_DATA: AnnotationData = {
     },
     "highestZIndex": 3
 };
+const EMPTY_ANNOTATION_DATA: AnnotationData = { annotationIds: [], annotations: {}, highestZIndex: 0 };
 const ANNOTATION_DATA_KEY = "mngo_annotation_data";
 
 
 // component
 function App() {
-    const [annotationData, setAnnotationData] = useLocalStorage<AnnotationData>(ANNOTATION_DATA_KEY, ANNOTATION_DATA);
+    const [annotationData, setAnnotationData] = useLocalStorage<AnnotationData>(ANNOTATION_DATA_KEY, { ...EMPTY_ANNOTATION_DATA });
     const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 

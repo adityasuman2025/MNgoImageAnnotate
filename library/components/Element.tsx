@@ -6,7 +6,7 @@ import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import useAnnotation from "../hooks/useAnnotation";
 import useToolIcon from "../hooks/useToolIcon";
 import { createGestureCleanup } from "../utils/gesture";
-import updateAnnotationById from "../utils/updateAnnotationById";
+import updateAnnotationById from "../utils/store";
 import { clampToBoundary } from "../utils/boundary";
 import { useGlobalStaticData } from "../context/GlobalStaticDataContext";
 

@@ -3,7 +3,7 @@ import type { AnnotationId } from "../types";
 import rotateIcon from "../images/rotateIcon.svg";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";
-import updateAnnotationById from "../utils/updateAnnotationById";
+import updateAnnotationById from "../utils/store";
 
 interface RotateButtonProps {
     id: AnnotationId;

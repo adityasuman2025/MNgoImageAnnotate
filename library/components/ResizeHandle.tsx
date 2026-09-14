@@ -4,7 +4,7 @@ import type { AnnotationId, Dimensions } from "../types";
 import { MIN_ELEMENT_DIMENSIONS } from "../constants";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
 import { createGestureCleanup } from "../utils/gesture";
-import updateAnnotationById from "../utils/updateAnnotationById";
+import updateAnnotationById from "../utils/store";
 
 interface ResizeHandleProps {
     id: AnnotationId;

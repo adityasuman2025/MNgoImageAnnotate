@@ -43,12 +43,11 @@ function MNgoImageAnnotate({
 
                     <div className="relative flex-1 flex">
                         {imgSrc ? (
-                            <Image src={imgSrc} bgRef={bgRef} onLoad={updateBaseDimensions} />
+                            <Image src={imgSrc} bgRef={bgRef} onDimensionsReady={updateBaseDimensions} />
                         ) : (
                             <div
                                 ref={(node) => {
                                     bgRef.current = node;
-                                    updateBaseDimensions(node);
                                 }}
                                 className="w-full absolute inset-0 pointer-events-none select-none flex-1"
                                 style={{

@@ -7,22 +7,26 @@ import globalStore from "../store";
 export interface ToolButtonProps {
     tool: Tool;
     isActive?: boolean;
+    disabled?: boolean;
     onClick?: (tool: Tool) => void;
 }
-export function ToolButton({ tool, isActive, onClick }: ToolButtonProps) {
+export function ToolButton({ tool, isActive = false, disabled = false, onClick }: ToolButtonProps) {
     return (
         <button
             type="button"
             title={tool.name}
             aria-label={tool.name}
             aria-pressed={isActive}
+            disabled={disabled}
             onClick={(e) => {
                 e.stopPropagation();
                 onClick?.(tool)
             }}
-            className={`p-1 rounded-md transition-colors cursor-pointer flex items-center justify-center ${isActive
-                ? "bg-teal-100 text-teal-800 ring-1 ring-teal-400"
-                : "hover:bg-gray-200 text-gray-600 active:bg-gray-200"
+            className={`p-1 rounded-md transition-colors flex items-center justify-center ${disabled
+                ? "opacity-30 cursor-not-allowed pointer-events-none text-gray-400"
+                : isActive
+                    ? "bg-teal-100 text-teal-800 ring-1 ring-teal-400 cursor-pointer"
+                    : "hover:bg-gray-200 text-gray-600 active:bg-gray-200 cursor-pointer"
                 }`}
         >
             {tool.btnIcon}
@@ -37,6 +41,8 @@ function Toolbar({
     className = "",
 }: ToolbarProps) {
     const activeToolName = useSyncExternalStore(globalStore.subscribeToActiveToolName, globalStore.getActiveToolName);
+    const isUndoDisabled = useSyncExternalStore(globalStore.subscribeToAnnotationData, globalStore.isUndoDisabled);
+    const isRedoDisabled = useSyncExternalStore(globalStore.subscribeToAnnotationData, globalStore.isRedoDisabled);
 
     const { compRootRef, readonly, tools } = useGlobalStaticData();
 
@@ -54,12 +60,12 @@ function Toolbar({
         } else if (tool.name === DEFAULT_TOOL_NAMES.UNDO) {
             globalStore.setActiveToolName(null);
 
-            // to-do: handle undo
+            globalStore.undo();
         } else if (tool.name === DEFAULT_TOOL_NAMES.REDO) {
             globalStore.setActiveToolName(null);
 
-            // to-do: handle redo
-        } else if (tool.name === DEFAULT_TOOL_NAMES.RESET) {
+            globalStore.redo();
+        } else if (tool.name === DEFAULT_TOOL_NAMES.CLEAR_ALL) {
             globalStore.setActiveToolName(null);
             globalStore.clearAnnotationData();
         } else {
@@ -83,7 +89,14 @@ function Toolbar({
                     <ToolButton
                         key={tool.name}
                         tool={tool}
-                        isActive={activeToolName === tool.name}
+                        isActive={tool.name === activeToolName}
+                        disabled={
+                            tool.name === DEFAULT_TOOL_NAMES.UNDO
+                                ? isUndoDisabled
+                                : tool.name === DEFAULT_TOOL_NAMES.REDO
+                                    ? isRedoDisabled
+                                    : false
+                        }
                         onClick={handleToolClick}
                     />
                 ))}

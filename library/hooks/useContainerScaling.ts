@@ -11,58 +11,55 @@ export default function useContainerScaling({
     compRootRef,
     imgSrc,
 }: UseContainerScalingOptions) {
-    const toScale = !!imgSrc; // we are not doing scaling when the backgound is not an image
-
+    const toScale = !!imgSrc;
     const [bgBaseDimn, setBgBaseDimn] = useState<Dimensions | null>(null);
     const scaleFactorRef = useRef<ScaleFactors>({ x: 1, y: 1 });
 
-    const updateBaseDimensions = useCallback((el: HTMLElement | null) => {
-        if (!el) return;
+    useEffect(() => {
+        setBgBaseDimn(null);
+    }, [imgSrc]); // reset base dimensions whenever the image source changes
 
-        let width = 0, height = 0;
-        if (el instanceof HTMLImageElement) {
-            width = el.naturalWidth;
-            height = el.naturalHeight;
-        } else {
-            const rect = el.getBoundingClientRect();
-            width = el.clientWidth || rect.width;
-            height = el.clientHeight || rect.height;
-        }
-
-        if (width > 0 && height > 0) setBgBaseDimn(prev => prev ?? { width, height });
+    const updateBaseDimensions = useCallback((dimn: Dimensions) => {
+        setBgBaseDimn(dimn);
     }, []);
 
     useEffect(() => {
-        // to handle scale factor when window is resized
-        if (!toScale) return;
+        const rootEl = compRootRef?.current;
+
+        function resetScaleStyles() {
+            if (rootEl) {
+                rootEl.style.removeProperty("max-height");
+                rootEl.style.removeProperty("--scale-x");
+                rootEl.style.removeProperty("--scale-y");
+            }
+            scaleFactorRef.current = { x: 1, y: 1 };
+        }
+
+        if (!toScale || !bgBaseDimn) return resetScaleStyles();
 
         const containerElement = bgRef?.current;
-        if (!containerElement || !bgBaseDimn) return;
+        if (!containerElement || !rootEl) return;
 
         let rafId: number | null = null;
         function updateScale() {
-            if (!containerElement || !bgBaseDimn) return;
-            const rect = containerElement.getBoundingClientRect();
-            const currentWidth = containerElement.clientWidth || rect.width;
-            const currentHeight = containerElement.clientHeight || rect.height;
+            const currentWidth = containerElement.clientWidth;
+            const currentHeight = containerElement.clientHeight;
+            if (!currentWidth || !currentHeight) return;
 
-            if (currentWidth === 0 || currentHeight === 0) return;
 
+            // Synchronously update ref so coordinate lookups are never lagging
             scaleFactorRef.current = { x: currentWidth / bgBaseDimn.width, y: currentHeight / bgBaseDimn.height };
 
             // storing the scale factor as var in style tags so that it can be directly applied in css for transform
             if (rafId === null) {
                 rafId = requestAnimationFrame(() => {
                     rafId = null;
-                    const rootEl = compRootRef.current;
-                    if (rootEl) {
-                        rootEl.style.setProperty('--scale-x', `${scaleFactorRef.current?.x}`);
-                        rootEl.style.setProperty('--scale-y', `${scaleFactorRef.current?.y}`);
-                        const toolbarHeight = (rootEl.firstElementChild?.clientHeight || 0) + 2;
+                    rootEl.style.setProperty('--scale-x', `${scaleFactorRef.current.x}`);
+                    rootEl.style.setProperty('--scale-y', `${scaleFactorRef.current.y}`);
+                    const toolbarHeight = (rootEl.firstElementChild?.clientHeight || 0) + 2;
 
-                        rootEl.style.maxHeight = `${bgBaseDimn.height * scaleFactorRef.current?.y + toolbarHeight}px`;
-                    }
-                })
+                    rootEl.style.maxHeight = `${bgBaseDimn.height * scaleFactorRef.current.y + toolbarHeight}px`;
+                });
             }
         }
 
@@ -75,6 +72,8 @@ export default function useContainerScaling({
                 rafId = null;
             }
             resizeObserver.disconnect();
+
+            resetScaleStyles();
         }
     }, [bgBaseDimn, toScale]);
 

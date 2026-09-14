@@ -1,22 +1,17 @@
 import { memo, useEffect, useState, type RefObject } from "react";
+import type { Dimensions } from "../types";
 
 interface ImageProps {
     src: string;
     bgRef: RefObject<HTMLElement | null>;
-    onLoad?: (el: HTMLImageElement) => void;
+    onDimensionsReady?: (dimensions: Dimensions) => void;
 }
-function Image({ src, bgRef, onLoad }: ImageProps) {
+function Image({ src, bgRef, onDimensionsReady }: ImageProps) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const el = bgRef.current as HTMLImageElement | null;
-        if (el?.complete && el?.naturalWidth > 0) {
-            setIsLoading(false);
-            onLoad?.(el);
-        } else {
-            setIsLoading(true);
-        }
-    }, [src, onLoad]);
+        setIsLoading(true);
+    }, [src]);
 
     return (
         <>
@@ -36,18 +31,20 @@ function Image({ src, bgRef, onLoad }: ImageProps) {
             <img
                 ref={(node) => {
                     bgRef.current = node;
-                    if (node && node.complete) {
+                    if (node && node.complete && node.naturalWidth > 0) {
                         setIsLoading(false);
-                        onLoad?.(node);
+                        onDimensionsReady?.({ width: node.naturalWidth, height: node.naturalHeight });
                     }
                 }}
-                className={`w-full absolute inset-0 pointer-events-none select-none object-contain object-top transition-opacity duration-200 ${isLoading ? "opacity-0" : "opacity-100"
-                    }`}
+                className={`w-full absolute inset-0 pointer-events-none select-none object-contain object-top transition-opacity duration-200 ${isLoading ? "opacity-0" : "opacity-100"}`}
                 src={src}
                 alt="Annotation image"
                 onLoad={(e) => {
                     setIsLoading(false);
-                    onLoad?.(e.currentTarget);
+                    const img = e.currentTarget;
+                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                        onDimensionsReady?.({ width: img.naturalWidth, height: img.naturalHeight });
+                    }
                 }}
                 onError={() => setIsLoading(false)}
             />

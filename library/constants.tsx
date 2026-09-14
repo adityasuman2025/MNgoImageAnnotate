@@ -3,7 +3,7 @@ import pencilIcon from "./images/pencilToolIcon.svg";
 import textIcon from "./images/textToolIcon.svg";
 import undoIcon from "./images/undoToolIcon.svg";
 import redoIcon from "./images/redoToolIcon.svg";
-import resetIcon from "./images/resetToolIcon.svg";
+import clearAllIcon from "./images/clearAllToolIcon.svg";
 import fullScrIcon from "./images/fullScrToolIcon.svg";
 
 export const DEFAULT_ELEMENT_DIMENSIONS: Dimensions = {
@@ -30,7 +30,7 @@ export const DEFAULT_TOOL_NAMES = {
     FULLSCREEN: "fullscreen",
     UNDO: "undo",
     REDO: "redo",
-    RESET: "reset",
+    CLEAR_ALL: "clear all",
     PENCIL: "pencil",
     TEXT: "text",
 };
@@ -50,8 +50,8 @@ export const DEFAULT_TOOLS: Tool[] = [
         btnIcon: <img src={redoIcon} alt="Redo" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
     },
     {
-        name: DEFAULT_TOOL_NAMES.RESET,
-        btnIcon: <img src={resetIcon} alt="Reset" className={DEFAULT_TOOL_ICON_CLASS} draggable={false} />,
+        name: DEFAULT_TOOL_NAMES.CLEAR_ALL,
+        btnIcon: <img src={clearAllIcon} alt="Clear all" className="h-4 w-auto" draggable={false} />,
     },
     {
         name: DEFAULT_TOOL_NAMES.PENCIL,
