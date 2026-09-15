@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { toPng } from 'html-to-image';
 import { createRoot } from 'react-dom/client';
 import "./index.css";
 import rectIcon from "./assets/rectShape.svg";
@@ -22,11 +23,11 @@ import cacheIcon from "./assets/cacheShape.svg";
 import gatewayIcon from "./assets/gatewayShape.svg";
 
 // @ts-ignore
-import MNgoImageAnnotate from "../dist/index.es.js";
-import type { Tool, AnnotationData } from "../dist/types";
+// import MNgoImageAnnotate from "../dist/index.es.js";
+// import type { Tool, AnnotationData } from "../dist/types";
 
-// import MNgoImageAnnotate from "../library/MNgoImageAnnotate";
-// import type { Tool, AnnotationData } from "../library/types";
+import MNgoImageAnnotate from "../library/MNgoImageAnnotate";
+import type { Tool, AnnotationData } from "../library/types";
 
 // indexedDB helper for image storage
 const DB_NAME = "mngo_annotate_db";
@@ -240,6 +241,7 @@ function App() {
     const [isDBChecked, setIsDBChecked] = useState(false);
     const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
     const [annotationData, setAnnotationData] = useLocalStorage<AnnotationData>(ANNOTATION_DATA_KEY, { ...EMPTY_ANNOTATION_DATA });
+    const [isDownloading, setIsDownloading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
@@ -267,6 +269,77 @@ function App() {
         setAnnotationData(newData);
     }, []);
 
+    const handleDownloadImage = async () => {
+        const groundEl = document.querySelector('[data-ground]') as HTMLElement | null;
+        if (!groundEl) return;
+
+        setIsDownloading(true);
+        try {
+            const bgImgEl = groundEl.querySelector('img[alt="Annotation image"]') as HTMLImageElement | null;
+            const width = bgImgEl?.naturalWidth || groundEl.clientWidth;
+            const height = bgImgEl?.naturalHeight || groundEl.clientHeight;
+            if (!width || !height) return;
+
+            // 1. Render live ground annotations to an image using html-to-image
+            const groundDataUrl = await toPng(groundEl, {
+                pixelRatio: width / groundEl.clientWidth,
+                cacheBust: false,
+                filter: (node) => {
+                    // Exclude selection handles/overlay
+                    if (node instanceof HTMLElement && node.dataset.selectionOverlay !== undefined) {
+                        return false;
+                    }
+                    // If no bg image, exclude the grid background div so export stays transparent
+                    if (!bgImgEl && node instanceof HTMLElement && node.classList.contains('flex-1')) {
+                        return false;
+                    }
+                    return true;
+                },
+            });
+
+            const freeDrawCanvas = groundEl.querySelector('canvas[data-free-draw-canvas]') as HTMLCanvasElement | null;
+
+            // 2. Draw background image first onto canvas (if available; otherwise transparent)
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = width;
+            exportCanvas.height = height;
+            const ctx = exportCanvas.getContext('2d');
+            if (!ctx) return;
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            if (bgImgEl?.complete) {
+                ctx.drawImage(bgImgEl, 0, 0, width, height);
+            }
+
+            // Draw freehand strokes directly
+            if (freeDrawCanvas) {
+                ctx.drawImage(freeDrawCanvas, 0, 0, width, height);
+            }
+
+            // Draw annotations on top
+            const annotationsImg = new Image();
+            await new Promise<void>((resolve, reject) => {
+                annotationsImg.onload = () => {
+                    ctx.drawImage(annotationsImg, 0, 0, width, height);
+                    resolve();
+                };
+                annotationsImg.onerror = reject;
+                annotationsImg.src = groundDataUrl;
+            });
+
+            const link = document.createElement('a');
+            link.download = `annotated-image-${Date.now()}.png`;
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        } catch (err) {
+            console.error('Failed to download annotated image', err);
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     return (
         <>
             <header className="flex items-center justify-between px-4 py-2.5 bg-white border-b border-gray-200 shadow-xs z-10">
@@ -289,10 +362,18 @@ function App() {
                     >
                         Upload Image
                     </button>
+                    <button
+                        type="button"
+                        disabled={isDownloading}
+                        onClick={handleDownloadImage}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-100 active:bg-gray-200 border border-gray-300 rounded-md transition-colors cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isDownloading ? 'Exporting...' : 'Download Image'}
+                    </button>
                 </div>
             </header>
 
-            <main className="flex flex-col mt-8 mx-8 border-t-1 border-zinc-300 rounded-xl overflow-hidden" style={{ height: `calc(100dvh - 80px)` }}>
+            <main className="flex flex-col mt-8 mx-8 rounded-xl overflow-hidden" style={{ height: `calc(100dvh - 80px)` }}>
                 {isDBChecked && (
                     <MNgoImageAnnotate
                         imgSrc={imgSrc}

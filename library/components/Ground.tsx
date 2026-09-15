@@ -118,7 +118,7 @@ function Ground({ onImageDimensionsReady }: GroundProps) {
     }, !readonly);
 
     return (
-        <div className="relative select-none" onPointerDown={handlePointerDown} >
+        <div data-ground className="relative select-none" onPointerDown={handlePointerDown} >
             {imgSrc ? (
                 <Image
                     src={imgSrc}
