@@ -41,7 +41,7 @@ function TextElement({
         }
     }, [isEditing]);
 
-    const handleDoubleClick = (e: React.MouseEvent) => {
+    const handleClick = (e: React.MouseEvent) => {
         if (readonly) return;
         e.stopPropagation();
         setIsEditing(true);
@@ -81,16 +81,17 @@ function TextElement({
                 onPointerDown={(e) => e.stopPropagation()} // don't trigger element drag while typing/selecting text
                 placeholder="Type text..."
                 rows={1}
-                className="w-full h-full bg-transparent text-red-600 placeholder:text-red-300 outline-none resize-none p-1 text-sm font-medium leading-tight select-text cursor-text"
+                className="w-full h-full bg-white/40 text-red-600 placeholder:text-red-300 outline-none resize-none p-1 text-sm font-medium leading-tight select-text cursor-text"
             />
         );
     }
 
     return (
         <div
-            onDoubleClick={handleDoubleClick}
-            className="w-full h-full p-1 flex items-center justify-start overflow-hidden text-red-600 text-sm font-medium leading-tight whitespace-pre-wrap break-words"
-            title={readonly ? undefined : "Double click to edit"}
+            data-text-element
+            onClick={handleClick}
+            className="w-full h-full p-1 flex items-start justify-start overflow-hidden text-red-600 text-sm font-medium leading-tight whitespace-pre-wrap break-words cursor-text pointer-events-auto"
+            title={readonly ? undefined : "Click to edit text"}
         >
             {localText || (!readonly ? (
                 <span className="text-red-400 italic">Type text...</span>

@@ -87,9 +87,9 @@ function Toolbar({
     return (
         <div
             data-toolbar
-            className={`sticky top-0 z-1 flex items-center justify-between px-3 py-2 bg-white/70 backdrop-blur-md border-b border-gray-200/80 select-none transition-colors ${className}`}
+            className={`sticky top-0 z-1 flex items-center justify-between gap-4 px-3 py-2 bg-white/70 backdrop-blur-md border-b border-gray-200/80 select-none transition-colors overflow-x-auto overflow-y-hidden ${className}`}
         >
-            <div className={`flex items-center gap-1.5 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
+            <div className={`flex items-center gap-1.5 shrink-0 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
                 {DEFAULT_TOOLS.map((tool) => (
                     <ToolButton
                         key={tool.name}
@@ -107,7 +107,7 @@ function Toolbar({
                 ))}
             </div>
 
-            <div className={`flex items-center gap-1.5 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
+            <div className={`flex items-center gap-1.5 shrink-0 ${readonly ? "opacity-50 pointer-events-none" : ""}`}>
                 {tools?.map((tool) => (
                     <ToolButton
                         key={tool.name}

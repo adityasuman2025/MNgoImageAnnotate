@@ -1,6 +1,6 @@
 {
     "name": "react-image-annotate-mngo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "module",
     "scripts": {
         "dev": "npm run lib-build && vite",
@@ -31,6 +31,7 @@
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.4",
         "@vitejs/plugin-react": "^6.1.0",
+        "html-to-image": "^1.11.13",
         "oxlint": "^1.79.0",
         "path": "^0.12.7",
         "tailwindcss": "^4.3.3",
