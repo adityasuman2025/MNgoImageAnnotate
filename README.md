@@ -1,25 +1,28 @@
 # react-image-annotate-mngo
 
-A high-performance, responsive React image annotation and markup component library built with TypeScript and Tailwind CSS. Annotate, sketch, stamp custom icons/shapes, and place text overlays directly on images or an interactive fallback canvas.
+A high-performance, responsive, canvas and DOM-hybrid image annotation library built for React. It allows users to place custom icon/text elements, free-hand draw with a responsive pencil tool, manipulate elements (drag, resize, rotate, copy/paste), and undo/redo operations with boundary clamping.
 
-[Live Demo](https://annotate.adityas.site)
+[Live Demo](https://annotate.adityas.site) • [npm package](https://www.npmjs.com/package/react-image-annotate-mngo)
+
+[![npm version](https://img.shields.io/npm/v/react-image-annotate-mngo.svg)](https://www.npmjs.com/package/react-image-annotate-mngo)
+[![npm downloads](https://img.shields.io/npm/dm/react-image-annotate-mngo.svg)](https://www.npmjs.com/package/react-image-annotate-mngo)
 
 ---
 
 ## Features
 
-- **GPU-Accelerated CSS Transforms**: Elements use `transform: translate3d(...) rotate(...)` instead of `top`/`left` layout properties, leveraging GPU compositing for 60fps rendering without layout reflows.
-- **Direct CSS DOM Mutation During Interactions**: Dragging, rotating, and resizing modify CSS variables directly on the element's DOM node in real-time, completely bypassing React re-renders during active interaction.
-- **Commit-on-Release State Model**: State updates commit to the store only on pointer release (`pointerup`), eliminating continuous store updates and re-render cycles during user interaction.
-- **Frame-Synced Updates with `requestAnimationFrame`**: Interactive gesture pipelines throttle visual DOM updates to the display's refresh rate via `requestAnimationFrame`.
-- **CSS Variable-Driven Container Scaling**: Scale factors (`--scale-x`, `--scale-y`) are stored as CSS custom properties on the root container, allowing all annotations and strokes to scale instantly on window or container resize without iterating over individual elements.
-- **Universal Pointer Event Handling**: Utilizes `pointerdown`, `pointermove`, and `pointerup` with `setPointerCapture` to deliver uniform gesture interactions across mouse, touchscreens, and styluses.
-- **Atomic State Management & Granular Subscriptions**: Each annotation element subscribes strictly to its own ID via `useSyncExternalStore`, ensuring modifying or selecting one item never triggers re-renders on other items.
-- **High-DPI Freehand Sketching**: Canvas rendering accounts for `devicePixelRatio` with midpoint quadratic bezier curves for smooth pencil strokes without pixelation.
-- **Dual Mode Support**: Annotate images with automatic aspect-ratio scaling, or use the coordinate grid canvas when no background image is provided.
+- **Interactive & Read-Only Modes**: Supports a clean `readonly` viewer state that disables interaction handlers, toolbars, and selection overlays for view-only display.
 - **Extensible Tool Registry**: Supports custom tool definitions and SVG stamps via the `tools` prop for specialized diagramming workflows.
+- **Resolution-Independent Coordinates**: Stored annotations use normalized base coordinates, ensuring saved data renders identically across different screen resolutions and aspect ratios.
+- **Boundary Clamping**: All drag, resize, stamp, paste, and draw gestures are strictly bounded to the image canvas, preventing annotations from getting pushed off-screen.
 - **Undo & Redo Stack**: Complete immutable snapshot history with dedicated toolbar controls and hotkeys.
 - **Keyboard Shortcuts**: Built-in hotkeys for Undo (<kbd>Ctrl/Cmd+Z</kbd>), Redo (<kbd>Ctrl/Cmd+Shift+Z</kbd> / <kbd>Ctrl+Y</kbd>), Copy/Paste (<kbd>Ctrl/Cmd+C</kbd>, <kbd>Ctrl/Cmd+V</kbd>), and Delete (<kbd>Delete</kbd> / <kbd>Backspace</kbd>), with smart input focus suppression.
+- **Universal Pointer Event Handling**: Utilizes `pointerdown`, `pointermove`, and `pointerup` to deliver uniform gesture interactions across mouse, touchscreens, and styluses.
+- **GPU-Accelerated CSS Transforms**: Elements use `transform: translate3d(...) rotate(...)` instead of `top`/`left` layout properties, leveraging GPU compositing for 60fps rendering without layout reflows.
+- **Direct DOM Manipulation with Commit-on-Release**: Dragging, rotating, and resizing modify CSS variables directly on the element's DOM node in real-time, bypassing React re-renders during interactions and committing to the store only on pointer release (`pointerup`).
+- **Frame-Synced Updates with `requestAnimationFrame`**: Interactive gesture pipelines throttle visual DOM updates to the display's refresh rate via `requestAnimationFrame`.
+- **Atomic State Management & Granular Subscriptions**: Each annotation element subscribes strictly to its own ID via `useSyncExternalStore`, ensuring modifying or selecting one item never triggers re-renders on other items.
+- **CSS Variable-Driven Container Scaling**: Scale factors (`--scale-x`, `--scale-y`) are stored as CSS custom properties on the root container, allowing all annotations and strokes to scale instantly on window or container resize without iterating over individual elements.
 - **Zero-Config CSS Injection**: Component styles are bundled and injected automatically via JavaScript runtime — no external CSS imports required.
 - **Fully Typed**: Written in TypeScript with complete declarations (`.d.ts`) exported out of the box.
 

@@ -3,7 +3,7 @@ import { ELEMENT_TRANSFORM_TEMPLATE, getElementTransformVariables } from "../uti
 import { useScaleFactor } from "../context/ScaleFactorContext";
 import SelectionOverlay from "./SelectionOverlay";
 import useUnmountCleanup from "../hooks/useUnmountCleanup";
-import useAnnotation from "../hooks/useAnnotation";
+import useAnnotationById from "../hooks/useAnnotationById";
 import useToolIcon from "../hooks/useToolIcon";
 import { createGestureCleanup } from "../utils/gesture";
 import updateAnnotationById from "../utils/store";
@@ -28,7 +28,7 @@ function Element({
     const { scaleFactorRef } = useScaleFactor();
     const cleanupDragRef = useUnmountCleanup(); // cleaning up the pointer window events and raf on un-mount
 
-    const { name, text, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef } = useAnnotation(id);
+    const { name, text, pos, rotation, dimensions, posRef, rotationRef, dimensionsRef } = useAnnotationById(id);
     const toolIcon = useToolIcon(name);
 
     const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {

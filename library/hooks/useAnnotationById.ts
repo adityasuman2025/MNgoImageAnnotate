@@ -4,7 +4,7 @@ import { DEFAULT_ELEMENT_DIMENSIONS, DEFAULT_ELEMENT_POS, DEFAULT_ELEMENT_ROTATI
 import globalStore from "../store";
 import useSyncedRef from "./useSyncedRef";
 
-export default function useAnnotation(id: AnnotationId) {
+export default function useAnnotationById(id: AnnotationId) {
     const subscribe = useCallback((cb: () => void) => globalStore.subscribeToAnnotationById(id, cb), [id]);
     const getSnapshot = useCallback(() => globalStore.getAnnotationById(id), [id]);
 
